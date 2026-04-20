@@ -1,0 +1,757 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  /* ✅ 这里就是你指定的 Pinterest 背景图，已经转为稳定直链 */
+  background: linear-gradient(rgba(255,255,255,0.87), rgba(255,255,255,0.87)),
+              url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: #333;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ------------------------------
+   Navbar
+------------------------------ */
+.navbar {
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  padding: 1rem 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.8rem;
+  align-items: center;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  color: #444;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+}
+
+.nav-btn:hover {
+  color: #4f46e5;
+  background: #f0f0ff;
+  transform: translateY(-1px);
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-login {
+  background: transparent;
+  border: 1px solid #4f46e5;
+  color: #4f46e5;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-login:hover {
+  background: #f0f0ff;
+}
+
+.btn-register {
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-register:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(79,70,229,0.15);
+}
+
+.btn-logout {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-logout:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(239,68,68,0.15);
+}
+
+/* ------------------------------
+   Hero Section
+------------------------------ */
+.hero {
+  text-align: center;
+  padding: 5rem 2rem;
+  border-radius: 20px;
+  margin: 2rem auto;
+  max-width: 1200px;
+}
+
+.hero h1 {
+  font-size: 2.6rem;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  font-size: 1.1rem;
+  color: #4b5563;
+  max-width: 700px;
+  margin: 0 auto 2.5rem;
+}
+
+.btn-hero {
+  background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+  color: #fff;
+  border: none;
+  padding: 0.9rem 2.2rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-hero:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(79,70,229,0.18);
+}
+
+/* ------------------------------
+   Mentors Section
+------------------------------ */
+.mentors-section {
+  padding: 4rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.mentors-section h2 {
+  font-size: 2rem;
+  color: #1f2937;
+  margin-bottom: 0.6rem;
+}
+
+.mentors-section p {
+  color: #6b7280;
+  margin-bottom: 2rem;
+}
+
+.search-box {
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 1rem 1.3rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.search-box input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+}
+
+.category-tags {
+  display: flex;
+  justify-content: center;
+  gap: 0.7rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+}
+
+.tag {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  color: #555;
+  padding: 0.5rem 1.1rem;
+  border-radius: 99px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tag:hover {
+  background: #4f46e5;
+  color: #fff;
+  border-color: #4f46e5;
+}
+
+.mentors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.no-result {
+  grid-column: 1/-1;
+  color: #888;
+  padding: 2rem;
+}
+
+/* ------------------------------
+   Mentor Card
+------------------------------ */
+.mentor-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 1.8rem;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  border: 1px solid #f3f4f6;
+  text-align: left;
+  transition: all 0.25s ease;
+}
+
+.mentor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(79,70,229,0.08);
+}
+
+.mentor-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mentor-info h3 {
+  font-size: 1.15rem;
+  color: #1f2937;
+  margin-bottom: 0.2rem;
+}
+
+.rating {
+  color: #f59e0b;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.mentor-card .major {
+  color: #4f46e5;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+}
+
+.mentor-card .lang {
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin-bottom: 0.8rem;
+}
+
+.mentor-card .desc {
+  color: #4b5563;
+  font-size: 0.9rem;
+  margin-bottom: 1.2rem;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.7rem;
+}
+
+.btn-save {
+  flex: 1;
+  background: #f9fafb;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  padding: 0.7rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-save:hover {
+  background: #e5e7eb;
+}
+
+.btn-book {
+  flex: 1.2;
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  color: white;
+  border: none;
+  padding: 0.7rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-book:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(79,70,229,0.15);
+}
+
+.view-all-btn {
+  margin-top: 2rem;
+}
+
+/* ------------------------------
+   Dashboard
+------------------------------ */
+.dashboard-section {
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 0 2rem;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.dashboard-header h2 {
+  font-size: 2rem;
+  color: #1f2937;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.dashboard-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  border: 1px solid #f3f4f6;
+}
+
+.dashboard-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.dashboard-card p {
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-btn {
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  color: white;
+  border: none;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.25s ease;
+}
+
+.dashboard-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(79,70,229,0.15);
+}
+
+/* ------------------------------
+   Bookings List
+------------------------------ */
+.bookings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.booking-item {
+  border: 1px solid #eef2ff;
+  background: #f8faff;
+  padding: 1.2rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+.booking-item p {
+  margin: 0.2rem 0;
+  color: #374151;
+}
+
+.status-upcoming {
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+.cancel-btn {
+  margin-top: 0.6rem;
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+/* ------------------------------
+   Modal
+------------------------------ */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 2.2rem;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.modal h2 {
+  background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal input {
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.modal input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.08);
+}
+
+.modal-btn {
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  color: white;
+  border: none;
+  padding: 0.9rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 0.7rem;
+}
+
+.modal-close {
+  background: #f9fafb;
+  color: #555;
+  border: 1px solid #e5e7eb;
+  padding: 0.9rem;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* ------------------------------
+   Footer
+------------------------------ */
+.contact-section {
+  background: #fff;
+  padding: 3rem 2rem;
+  text-align: center;
+  border-radius: 16px 16px 0 0;
+  margin-top: 4rem;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
+}
+
+.contact-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.contact-section p {
+  color: #6b7280;
+  margin: 0.3rem 0;
+}
+
+/* ------------------------------
+   Back Button & Utils
+------------------------------ */
+.back-btn {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 0.7rem 1.3rem;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 2rem;
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: #4338ca;
+}
+
+/* ------------------------------
+   About
+------------------------------ */
+.about-section {
+  max-width: 800px;
+  margin: 4rem auto;
+  padding: 0 2rem;
+  text-align: center;
+}
+
+.about-section h2 {
+  font-size: 2.2rem;
+  margin-bottom: 1.5rem;
+  color: #1f2937;
+}
+
+.about-section p {
+  font-size: 1.05rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+/* ------------------------------
+   Career Pathways
+------------------------------ */
+.careers-section {
+  max-width: 1200px;
+  margin: 3rem auto;
+  padding: 0 2rem;
+}
+
+.careers-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.careers-header h2 {
+  font-size: 2rem;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.careers-header p {
+  color: #6b7280;
+  font-size: 1.05rem;
+}
+
+.pathways-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.path-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 2rem;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+  border: 1px solid #f3f4f6;
+  text-align: center;
+  transition: all 0.25s ease;
+}
+
+.path-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(79,70,229,0.08);
+}
+
+.path-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.path-card h3 {
+  font-size: 1.3rem;
+  color: #1f2937;
+  margin-bottom: 1.5rem;
+}
+
+.path-steps {
+  margin-bottom: 1.5rem;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.step-num {
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(90deg, #4f46e5, #8b5cf6);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+.step-content h4 {
+  font-size: 0.95rem;
+  color: #1f2937;
+  margin-bottom: 0.2rem;
+}
+
+.step-content p {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.path-btn {
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.25s ease;
+}
+
+.path-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(79,70,229,0.15);
+}
+
+/* ------------------------------
+   Pathway Detail Modal
+------------------------------ */
+.pathway-detail-modal {
+  max-width: 600px !important;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.detail-icon {
+  font-size: 2.5rem;
+}
+.detail-desc {
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+}
+.detail-section {
+  margin-bottom: 1.5rem;
+}
+.detail-section h4 {
+  color: #1f2937;
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+}
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.skill-tag {
+  background: #eef2ff;
+  color: #4f46e5;
+  padding: 0.4rem 0.8rem;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.career-list {
+  list-style: none;
+  padding: 0;
+}
+.career-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+}
+
+/* ------------------------------
+   Find Mentor Button
+------------------------------ */
+.mentor-path-btn {
+  margin-top: 0.7rem !important;
+  background: linear-gradient(90deg, #10b981, #059669) !important;
+}
+.mentor-path-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.15);
+}
