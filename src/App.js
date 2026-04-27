@@ -401,16 +401,52 @@ function App() {
         </section>
       )}
 
-      {currentPage === 'about' && (
-        <section className="about-section">
-          <h2>About Mentor MY</h2>
-          <p>Mentor MY is a platform to connect students with experienced mentors in Malaysia.</p>
-          <p>We help you choose career pathways, improve academic performance, and get guidance for university and jobs.</p>
-          <button className="btn-hero" onClick={() => setCurrentPage('home')}>
-            Back to Home
-          </button>
-        </section>
-      )}
+{currentPage === 'about' && (
+  <section className="about-section" style={{padding: '3rem 1rem', maxWidth: '1000px', margin: '0 auto'}}>
+    <h2 style={{fontSize: '2.2rem', marginBottom: '1rem'}}>About Mentor MY</h2>
+    <p style={{maxWidth: '800px', margin: '0 auto 1rem auto', fontSize: '1.1rem', lineHeight: '1.8'}}>
+      Mentor MY is a dedicated student mentoring platform built for Malaysian secondary & pre-university students.
+    </p>
+    <p style={{maxWidth: '800px', margin: '0 auto 2.5rem auto', fontSize: '1.1rem', lineHeight: '1.8'}}>
+      We connect you with senior, experienced mentors across Computer Science, Business, Engineering, Medical and more.
+      Whether you are figuring out your SPM pathway, choosing university course, or planning your dream career,
+      we are here to guide you every step of the way.
+    </p>
+
+    <div className="pathways-grid" style={{marginBottom: '3rem'}}>
+      <div className="path-card">
+        <div className="path-icon">🎓</div>
+        <h4>Trusted Mentors</h4>
+        <p>Experienced seniors & industry experts</p>
+      </div>
+      <div className="path-card">
+        <div className="path-icon">🛤️</div>
+        <h4>Clear Career Roadmap</h4>
+        <p>Step-by-step pathway for every major</p>
+      </div>
+      <div className="path-card">
+        <div className="path-icon">🇲🇾</div>
+        <h4>Malaysia Focused</h4>
+        <p>Local courses, unis & job market</p>
+      </div>
+      <div className="path-card">
+        <div className="path-icon">💛</div>
+        <h4>Student First</h4>
+        <p>Friendly, simple & affordable guidance</p>
+      </div>
+    </div>
+
+    <button className="btn-hero" onClick={() => setCurrentPage('home')}>
+      Back to Home
+    </button>
+
+    <div className="contact-section" style={{marginTop: '4rem', padding: '2rem', borderRadius: '16px', backgroundColor: 'rgba(255,255,255,0.75)'}}>
+      <h2>Contact Us</h2>
+      <p style={{margin: '0.5rem 0'}}>📧 Email: support@mentormy.com</p>
+      <p style={{margin: '0.5rem 0'}}>📍 Location: Kuala Lumpur, Malaysia</p>
+    </div>
+  </section>
+)}
 
       <section className="contact-section">
         <h2>Contact Us</h2>
