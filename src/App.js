@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import './App.css';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
+  // 页面状态：默认打开直接进入注册落地页
+  const [currentPage, setCurrentPage] = useState('landing');
   const [user, setUser] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
@@ -15,7 +16,7 @@ function App() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', email: '' });
 
-  // ✅ 新增：Saved Mentors 收藏列表
+  // 收藏导师列表
   const [savedMentors, setSavedMentors] = useState([]);
 
   const allMentors = [
@@ -27,6 +28,7 @@ function App() {
     { id: 6, name: 'Lim Wei', major: 'Design', lang: 'English, Mandarin', rating: 4.7, desc: 'Graphic design, UI/UX & creative portfolio.' },
   ];
 
+  // 4大职业路线（含Medical）
   const pathways = [
     {
       id: 1,
@@ -70,7 +72,6 @@ function App() {
         { title: 'Professional Engineer License', desc: 'Board certification' },
       ]
     },
-    // ✅ 新增 Medical 完整板块
     {
       id: 4,
       title: 'Medical & Healthcare',
@@ -95,11 +96,13 @@ function App() {
   const handleLogin = (email, password) => {
     setUser({ email, name: email.split('@')[0] });
     setShowLogin(false);
+    setCurrentPage('home');
   };
 
   const handleRegister = (name, email, password) => {
     setUser({ name, email });
     setShowRegister(false);
+    setCurrentPage('home');
   };
 
   const handleBook = (mentor, date, topic) => {
@@ -129,7 +132,7 @@ function App() {
     setShowEditModal(false);
   };
 
-  // ✅ 收藏 / 取消收藏导师
+  // 收藏/取消收藏导师
   const toggleSaveMentor = (mentor) => {
     const isSaved = savedMentors.some(m => m.id === mentor.id);
     if (isSaved) {
@@ -139,7 +142,6 @@ function App() {
     }
   };
 
-  // 判断是否已收藏
   const isMentorSaved = (mentorId) => {
     return savedMentors.some(m => m.id === mentorId);
   };
@@ -168,6 +170,71 @@ function App() {
           )}
         </div>
       </nav>
+
+      {/* 独立注册落地页（网站打开默认首页） */}
+      {currentPage === 'landing' && !user && (
+        <section style={{
+          minHeight: '80vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2rem'
+        }}>
+          <div style={{
+            backgroundColor: 'rgba(255,255,255,0.9)',
+            padding: '3rem',
+            borderRadius: '20px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+            width: '100%',
+            maxWidth: '450px',
+            textAlign: 'center'
+          }}>
+            <h1 style={{fontSize: '2rem', marginBottom: '0.5rem'}}>Join Mentor MY 🎓</h1>
+            <p style={{color: '#666', marginBottom: '2rem'}}>Create your account to find your perfect mentor today</p>
+
+            <input 
+              type="text" 
+              placeholder="Full Name"
+              style={{width:'100%', padding:'0.9rem', marginBottom:'1rem', borderRadius:'8px', border:'1px solid #ddd'}}
+            />
+            <input 
+              type="email" 
+              placeholder="Email Address"
+              style={{width:'100%', padding:'0.9rem', marginBottom:'1rem', borderRadius:'8px', border:'1px solid #ddd'}}
+            />
+            <input 
+              type="password" 
+              placeholder="Password"
+              style={{width:'100%', padding:'0.9rem', marginBottom:'1.5rem', borderRadius:'8px', border:'1px solid #ddd'}}
+            />
+
+            <button 
+              className="btn-hero"
+              style={{width:'100%', padding:'1rem', fontSize:'1.1rem'}}
+              onClick={() => {
+                handleRegister('New Student', 'new@user.com', '123456');
+              }}
+            >
+              Register Now
+            </button>
+
+            <p style={{marginTop:'1.5rem'}}>
+              Already have an account? 
+              <button onClick={() => setShowLogin(true)} style={{color:'#4f46e5', fontWeight:'bold', marginLeft:'0.3rem', background:'none', border:'none', cursor:'pointer'}}>
+                Login here
+              </button>
+            </p>
+
+            <button 
+              onClick={() => setCurrentPage('home')}
+              style={{marginTop:'1rem', background:'none', border:'none', color:'#666', cursor:'pointer'}}
+            >
+              Skip & Browse First
+            </button>
+          </div>
+        </section>
+      )}
 
       {currentPage === 'home' && (
         <>
@@ -363,7 +430,7 @@ function App() {
             </div>
           </div>
 
-          {/* ✅ 新增：Saved Mentors 区域 */}
+          {/* Saved Mentors */}
           <div className="dashboard-section" style={{ marginTop: '2rem' }}>
             <h3 style={{ marginBottom: '1.5rem', fontSize: '1.4rem' }}>Saved Mentors</h3>
 
@@ -401,59 +468,62 @@ function App() {
         </section>
       )}
 
-{currentPage === 'about' && (
-  <section className="about-section" style={{padding: '3rem 1rem', maxWidth: '1000px', margin: '0 auto'}}>
-    <h2 style={{fontSize: '2.2rem', marginBottom: '1rem'}}>About Mentor MY</h2>
-    <p style={{maxWidth: '800px', margin: '0 auto 1rem auto', fontSize: '1.1rem', lineHeight: '1.8'}}>
-      Mentor MY is a dedicated student mentoring platform built for Malaysian secondary & pre-university students.
-    </p>
-    <p style={{maxWidth: '800px', margin: '0 auto 2.5rem auto', fontSize: '1.1rem', lineHeight: '1.8'}}>
-      We connect you with senior, experienced mentors across Computer Science, Business, Engineering, Medical and more.
-      Whether you are figuring out your SPM pathway, choosing university course, or planning your dream career,
-      we are here to guide you every step of the way.
-    </p>
+      {currentPage === 'about' && (
+        <section className="about-section" style={{padding: '3rem 1rem', maxWidth: '1000px', margin: '0 auto'}}>
+          <h2 style={{fontSize: '2.2rem', marginBottom: '1rem'}}>About Mentor MY</h2>
+          <p style={{maxWidth: '800px', margin: '0 auto 1rem auto', fontSize: '1.1rem', lineHeight: '1.8'}}>
+            Mentor MY is a dedicated student mentoring platform built for Malaysian secondary & pre-university students.
+          </p>
+          <p style={{maxWidth: '800px', margin: '0 auto 2.5rem auto', fontSize: '1.1rem', lineHeight: '1.8'}}>
+            We connect you with senior, experienced mentors across Computer Science, Business, Engineering, Medical and more.
+            Whether you are figuring out your SPM pathway, choosing university course, or planning your dream career,
+            we are here to guide you every step of the way.
+          </p>
 
-    <div className="pathways-grid" style={{marginBottom: '3rem'}}>
-      <div className="path-card">
-        <div className="path-icon">🎓</div>
-        <h4>Trusted Mentors</h4>
-        <p>Experienced seniors & industry experts</p>
-      </div>
-      <div className="path-card">
-        <div className="path-icon">🛤️</div>
-        <h4>Clear Career Roadmap</h4>
-        <p>Step-by-step pathway for every major</p>
-      </div>
-      <div className="path-card">
-        <div className="path-icon">🇲🇾</div>
-        <h4>Malaysia Focused</h4>
-        <p>Local courses, unis & job market</p>
-      </div>
-      <div className="path-card">
-        <div className="path-icon">💛</div>
-        <h4>Student First</h4>
-        <p>Friendly, simple & affordable guidance</p>
-      </div>
-    </div>
+          <div className="pathways-grid" style={{marginBottom: '3rem'}}>
+            <div className="path-card">
+              <div className="path-icon">🎓</div>
+              <h4>Trusted Mentors</h4>
+              <p>Experienced seniors & industry experts</p>
+            </div>
+            <div className="path-card">
+              <div className="path-icon">🛤️</div>
+              <h4>Clear Career Roadmap</h4>
+              <p>Step-by-step pathway for every major</p>
+            </div>
+            <div className="path-card">
+              <div className="path-icon">🇲🇾</div>
+              <h4>Malaysia Focused</h4>
+              <p>Local courses, unis & job market</p>
+            </div>
+            <div className="path-card">
+              <div className="path-icon">💛</div>
+              <h4>Student First</h4>
+              <p>Friendly, simple & affordable guidance</p>
+            </div>
+          </div>
 
-    <button className="btn-hero" onClick={() => setCurrentPage('home')}>
-      Back to Home
-    </button>
+          <button className="btn-hero" onClick={() => setCurrentPage('home')}>
+            Back to Home
+          </button>
 
-    <div className="contact-section" style={{marginTop: '4rem', padding: '2rem', borderRadius: '16px', backgroundColor: 'rgba(255,255,255,0.75)'}}>
-      <h2>Contact Us</h2>
-      <p style={{margin: '0.5rem 0'}}>📧 Email: support@mentormy.com</p>
-      <p style={{margin: '0.5rem 0'}}>📍 Location: Sibu, Sarawak, Malaysia</p>
-    </div>
-  </section>
-)}
+          {/* About页面内Contact（地址已改为Sibu） */}
+          <div className="contact-section" style={{marginTop: '4rem', padding: '2rem', borderRadius: '16px', backgroundColor: 'rgba(255,255,255,0.75)'}}>
+            <h2>Contact Us</h2>
+            <p style={{margin: '0.5rem 0'}}>📧 Email: support@mentormy.com</p>
+            <p style={{margin: '0.5rem 0'}}>📍 Location: Sibu, Sarawak, Malaysia</p>
+          </div>
+        </section>
+      )}
 
+      {/* 全局底部Footer Contact（地址也改为Sibu，两处完全统一） */}
       <section className="contact-section">
         <h2>Contact Us</h2>
         <p>Email: support@mentormy.com</p>
-        <p>Location: Kuala Lumpur, Malaysia</p>
+        <p>Location: Sibu, Sarawak, Malaysia</p>
       </section>
 
+      {/* 所有弹窗组件 */}
       {showLogin && (
         <div className="modal-overlay">
           <div className="modal">
