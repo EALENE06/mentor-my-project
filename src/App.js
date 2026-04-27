@@ -443,7 +443,7 @@ function App() {
     <div className="contact-section" style={{marginTop: '4rem', padding: '2rem', borderRadius: '16px', backgroundColor: 'rgba(255,255,255,0.75)'}}>
       <h2>Contact Us</h2>
       <p style={{margin: '0.5rem 0'}}>📧 Email: support@mentormy.com</p>
-      <p style={{margin: '0.5rem 0'}}>📍 Location: Kuala Lumpur, Malaysia</p>
+      <p style={{margin: '0.5rem 0'}}>📍 Location: Sibu, Sarawak, Malaysia</p>
     </div>
   </section>
 )}
