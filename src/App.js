@@ -70,6 +70,21 @@ function App() {
         { title: 'Professional Engineer License', desc: 'Board certification' },
       ]
     },
+    // ✅ 新增 Medical 完整板块
+    {
+      id: 4,
+      title: 'Medical & Healthcare',
+      icon: '🩺',
+      desc: 'Pursue medicine, nursing, pharmacy and health-related careers.',
+      skills: ['Biology', 'Chemistry', 'Medical Science', 'Patient Care', 'Research'],
+      jobs: ['Doctor', 'Nurse', 'Pharmacist', 'Medical Lab Tech', 'Healthcare Officer'],
+      steps: [
+        { title: 'Strong Science Base', desc: 'Biology, chemistry, pre-med foundation' },
+        { title: 'Specialize & Practice', desc: 'Medicine, nursing, pharmacy training' },
+        { title: 'Clinical Attachment', desc: 'Hospital & healthcare practical' },
+        { title: 'Professional Registration', desc: 'Medical board certification' },
+      ]
+    }
   ];
 
   const filteredMentors = allMentors.filter(m =>
