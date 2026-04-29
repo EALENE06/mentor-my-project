@@ -1,6 +1,63 @@
 import React, { useState } from 'react';
 import './App.css';
 
+// ========== Inheritance & Polymorphism (Teacher Requirement) ==========
+// Parent Class 父类
+// ========== OOP Concepts: Encapsulation, Inheritance & Polymorphism ==========
+
+// Parent Class
+class User {
+  #name;
+  #email;
+
+  constructor(name, email) {
+    this.#name = name;
+    this.#email = email;
+  }
+
+  getName() {
+    return this.#name;
+  }
+
+  setName(name) {
+    this.#name = name;
+  }
+
+  getEmail() {
+    return this.#email;
+  }
+
+  setEmail(email) {
+    this.#email = email;
+  }
+
+  getRoleInfo() {
+    return "General Platform User";
+  }
+}
+
+// Inheritance: Student inherits from User
+class Student extends User {
+  getRoleInfo() {
+    return "Student: Can search, save and book mentors";
+  }
+}
+
+// Inheritance: Mentor inherits from User
+class Mentor extends User {
+  getRoleInfo() {
+    return "Mentor: Provides Sarawak career and study guidance";
+  }
+}
+
+// Polymorphism demo
+const user1 = new Student("Student Aisha", "student@mail.com");
+const user2 = new Mentor("Mentor Daniel", "mentor@mail.com");
+
+console.log(user1.getName(), "-", user1.getRoleInfo());
+console.log(user2.getName(), "-", user2.getRoleInfo());
+// =====================================================================
+
 function App() {
   // 页面状态：默认打开直接进入注册落地页
   const [currentPage, setCurrentPage] = useState('landing');
@@ -20,12 +77,72 @@ function App() {
   const [savedMentors, setSavedMentors] = useState([]);
 
   const allMentors = [
-    { id: 1, name: 'Aisha Tan', major: 'Computer Science', lang: 'English, Malay', rating: 4.9, desc: 'Web development & programming basics guidance.' },
-    { id: 2, name: 'Daniel Lee', major: 'Data Science', lang: 'English, Malay', rating: 4.8, desc: 'Python, statistics & data analysis help.' },
-    { id: 3, name: 'Priya Nair', major: 'Business', lang: 'English, Malay, Tamil', rating: 4.7, desc: 'Accounting, business studies & career tips.' },
-    { id: 4, name: 'Muhammad Amir', major: 'Engineering', lang: 'English, Malay', rating: 4.6, desc: 'Electrical & mechanical engineering guidance.' },
-    { id: 5, name: 'Siti Hajar', major: 'Medicine', lang: 'English, Malay', rating: 4.9, desc: 'Medical entry tips & study guidance.' },
-    { id: 6, name: 'Lim Wei', major: 'Design', lang: 'English, Mandarin', rating: 4.7, desc: 'Graphic design, UI/UX & creative portfolio.' },
+    {
+      id: 1,
+      name: 'Aisha Tan',
+      major: 'Computer Science',
+      lang: 'English, Malay',
+      rating: 4.9,
+      location: 'Kuching',
+      industry: 'Tech',
+      company: 'Sarawak Digital Economy',
+      desc: 'Guidance on web development and tech careers in Sarawak.'
+    },
+    {
+      id: 2,
+      name: 'Daniel Lee',
+      major: 'Data Science',
+      lang: 'English, Malay',
+      rating: 4.8,
+      location: 'Miri',
+      industry: 'Data / Oil & Gas',
+      company: 'Local Energy Company',
+      desc: 'Guidance on Python, data analysis and data careers linked to local industries.'
+    },
+    {
+      id: 3,
+      name: 'Priya Nair',
+      major: 'Business',
+      lang: 'English, Malay, Tamil',
+      rating: 4.7,
+      location: 'Sibu',
+      industry: 'Business / SME',
+      company: 'Local Business Consultant',
+      desc: 'Guidance on business studies, accounting and starting careers in local companies.'
+    },
+    {
+      id: 4,
+      name: 'Muhammad Amir',
+      major: 'Engineering',
+      lang: 'English, Malay',
+      rating: 4.6,
+      location: 'Bintulu',
+      industry: 'Engineering / Energy',
+      company: 'Industrial Engineering Firm',
+      desc: 'Guidance on engineering study paths and industrial career opportunities in Sarawak.'
+    },
+    {
+      id: 5,
+      name: 'Siti Hajar',
+      major: 'Medicine',
+      lang: 'English, Malay',
+      rating: 4.9,
+      location: 'Kuching',
+      industry: 'Healthcare',
+      company: 'Local Healthcare Centre',
+      desc: 'Guidance on medical entry, healthcare study routes and serving local communities.'
+    },
+    {
+      id: 6,
+      name: 'Lim Wei',
+      major: 'Design',
+      lang: 'English, Mandarin',
+      rating: 4.7,
+      location: 'Kuching',
+      industry: 'Creative / UIUX',
+      company: 'Local Creative Studio',
+      desc: 'Guidance on graphic design, UI/UX portfolio and creative jobs in Sarawak.'
+    }
   ];
 
   // 4大职业路线（含Medical）
@@ -35,6 +152,7 @@ function App() {
       title: 'Computer Science',
       icon: '💻',
       desc: 'Build software, apps, websites and AI systems.',
+      demand: '🔥 High demand in Sarawak Digital Economy (PCDS)',
       skills: ['Python', 'JavaScript', 'Java', 'SQL', 'UI/UX'],
       jobs: ['Software Engineer', 'Web Developer', 'Data Scientist', 'AI Engineer', 'Cybersecurity'],
       steps: [
@@ -49,6 +167,7 @@ function App() {
       title: 'Business & Accounting',
       icon: '📊',
       desc: 'Manage businesses, finance, marketing and teams.',
+      demand: '📈 Strong demand in local SMEs and entrepreneurship',
       skills: ['Accounting', 'Marketing', 'Economics', 'Management', 'Excel'],
       jobs: ['Accountant', 'Marketing Executive', 'Business Analyst', 'Bank Officer', 'Manager'],
       steps: [
@@ -63,6 +182,7 @@ function App() {
       title: 'Engineering',
       icon: '🔧',
       desc: 'Design, build and maintain electrical, mechanical & civil systems.',
+      demand: '⚡ High demand in oil, gas and infrastructure sectors (Bintulu/Miri)',
       skills: ['Math', 'Physics', 'CAD', 'Circuits', 'Mechanics'],
       jobs: ['Electrical Engineer', 'Mechanical Engineer', 'Civil Engineer', 'Tech Consultant'],
       steps: [
@@ -77,6 +197,7 @@ function App() {
       title: 'Medical & Healthcare',
       icon: '🩺',
       desc: 'Pursue medicine, nursing, pharmacy and health-related careers.',
+      demand: '🏥 Continuous demand in Sarawak healthcare services',
       skills: ['Biology', 'Chemistry', 'Medical Science', 'Patient Care', 'Research'],
       jobs: ['Doctor', 'Nurse', 'Pharmacist', 'Medical Lab Tech', 'Healthcare Officer'],
       steps: [
@@ -94,7 +215,7 @@ function App() {
   );
 
   const handleLogin = (email, password) => {
-    setUser({ email, name: email.split('@')[0] });
+    setUser(new Student(email.split('@')[0], email));
     setShowLogin(false);
     setCurrentPage('home');
   };
@@ -228,7 +349,7 @@ function App() {
 
             <button 
               onClick={() => setCurrentPage('home')}
-              style={{marginTop:'1rem', background:'none', border:'none', color:'#666', cursor:'pointer'}}
+              style={{marginTop:'1rem', background:'none', border:'none', color:'666', cursor:'pointer'}}
             >
               Skip & Browse First
             </button>
@@ -269,6 +390,8 @@ function App() {
                     <div className="major">{m.major}</div>
                     <div className="lang">Languages: {m.lang}</div>
                     <div className="desc">{m.desc}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.8rem' }}>
+                      <p>📍 {m.location} | 🏭 {m.industry} | 🏢 {m.company}</p> </div>
                     <div className="card-actions">
                       <button className="btn-save" onClick={() => toggleSaveMentor(m)}>
                         {isMentorSaved(m.id) ? 'Unsave' : 'Save'}
@@ -328,6 +451,8 @@ function App() {
                   <div className="major">{m.major}</div>
                   <div className="lang">Languages: {m.lang}</div>
                   <div className="desc">{m.desc}</div>
+                  <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.8rem' }}>
+                      <p>📍 {m.location} | 🏭 {m.industry} | 🏢 {m.company}</p> </div>
                   <div className="card-actions">
                     <button className="btn-save" onClick={() => toggleSaveMentor(m)}>
                       {isMentorSaved(m.id) ? 'Unsave' : 'Save'}
@@ -359,6 +484,9 @@ function App() {
               <div className="path-card" key={p.id}>
                 <div className="path-icon">{p.icon}</div>
                 <h3>{p.title}</h3>
+                <div style={{ fontSize: '0.85rem', color: '#4f46e5', marginBottom: '1rem', fontWeight: '600' }}> 
+                  {p.demand} 
+                  </div>
                 <div className="path-steps">
                   {p.steps.slice(0, 2).map((s, i) => (
                     <div className="step" key={i}>
@@ -396,8 +524,8 @@ function App() {
             {/* Profile */}
             <div className="dashboard-card">
               <h3>My Profile</h3>
-              <p>Name: {user.name}</p>
-              <p>Email: {user.email}</p>
+              <p>Name: {user.getName}</p>
+              <p>Email: {user.getEmail}</p>
               <button className="dashboard-btn" onClick={() => {
                 setEditForm({ name: user.name, email: user.email });
                 setShowEditModal(true);
@@ -452,6 +580,8 @@ function App() {
                     <div className="major">{m.major}</div>
                     <div className="lang">Languages: {m.lang}</div>
                     <div className="desc">{m.desc}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.8rem' }}>
+                      <p>📍 {m.location} | 🏭 {m.industry} | 🏢 {m.company}</p> </div>
                     <div className="card-actions">
                       <button className="btn-save" onClick={() => toggleSaveMentor(m)}>
                         Unsave
@@ -633,7 +763,7 @@ function App() {
               onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
             />
             <button className="modal-btn" onClick={handleSaveEdit}>Save Changes</button>
-            <button className="modal-close" onClick={() => setShowEditModal(false)}>Cancel</button>
+            <button className="modal-close" onClick={() => setShowEditModal(false)}>Close</button>
           </div>
         </div>
       )}
