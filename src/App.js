@@ -236,6 +236,8 @@ function App() {
     };
     setBookings([...bookings, newBooking]);
     setShowBookModal(false);
+    
+    alert("✅ Booking successful!");
   };
 
   const cancelBooking = (id) => {
@@ -374,7 +376,7 @@ function App() {
   </h2>
 
   <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
-    Sarawak is rapidly growing with opportunities in technology, engineering, healthcare and local industries. 
+    Sarawak is rapidly growing with opportunities in technology, egngineering, healthcare and local industries. 
     Instead of leaving, students can build meaningful careers locally with strong community impact.
   </p>
 
