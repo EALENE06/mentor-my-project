@@ -360,6 +360,32 @@ function App() {
       {currentPage === 'home' && (
         <>
           <section className="hero">
+          <section style={{
+  maxWidth: '1000px',
+  margin: '2rem auto',
+  padding: '2rem',
+  background: 'rgba(255,255,255,0.9)',
+  borderRadius: '16px',
+  textAlign: 'center',
+  boxShadow: '0 4px 14px rgba(0,0,0,0.05)'
+}}>
+  <h2 style={{ marginBottom: '1rem', color: '#1f2937' }}>
+    🌏 Why Build Your Career in Sarawak?
+  </h2>
+
+  <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
+    Sarawak is rapidly growing with opportunities in technology, engineering, healthcare and local industries. 
+    Instead of leaving, students can build meaningful careers locally with strong community impact.
+  </p>
+
+  <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+    <div>💻 Growing Digital Economy (PCDS)</div>
+    <div>🏭 Expanding Oil & Gas Sector</div>
+    <div>🏥 Increasing Healthcare Demand</div>
+    <div>📈 Strong SME & Business Opportunities</div>
+  </div>
+</section>
+
             <h1>Welcome to Mentor MY</h1>
             <p>Connect with experienced mentors, get academic guidance, and build your future career pathway — all in one platform.</p>
             <button className="btn-hero" onClick={() => setCurrentPage('mentors')}>Browse Mentors</button>
