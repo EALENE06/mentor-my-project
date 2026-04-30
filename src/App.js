@@ -73,6 +73,12 @@ function App() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', email: '' });
 
+  // 登录/注册表单状态
+  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
+  const [registerForm, setRegisterForm] = useState({ name: '', email: '', password: '' });
+  const [landingRegisterForm, setLandingRegisterForm] = useState({ name: '', email: '', password: '' });
+  const [bookingForm, setBookingForm] = useState({ date: '', topic: '' });
+
   // 收藏导师列表
   const [savedMentors, setSavedMentors] = useState([]);
 
@@ -215,18 +221,26 @@ function App() {
   );
 
   const handleLogin = (email, password) => {
-    setUser(new Student(email.split('@')[0], email));
+    const newUser = new Student(email.split('@')[0], email);
+    setUser(newUser);
     setShowLogin(false);
+    setLoginForm({ email: '', password: '' });
     setCurrentPage('home');
   };
 
   const handleRegister = (name, email, password) => {
-    setUser({ name, email });
+    const newUser = new Student(name, email);
+    setUser(newUser);
     setShowRegister(false);
+    setRegisterForm({ name: '', email: '', password: '' });
     setCurrentPage('home');
   };
 
   const handleBook = (mentor, date, topic) => {
+    if (!date || !topic) {
+      alert("⚠️ Please fill in both date and topic!");
+      return;
+    }
     const newBooking = {
       id: Date.now(),
       mentorName: mentor.name,
@@ -236,6 +250,7 @@ function App() {
     };
     setBookings([...bookings, newBooking]);
     setShowBookModal(false);
+    setBookingForm({ date: '', topic: '' });
     
     alert("✅ Booking successful!");
   };
@@ -251,7 +266,9 @@ function App() {
   };
 
   const handleSaveEdit = () => {
-    setUser({ ...user, name: editForm.name, email: editForm.email });
+    user.setName(editForm.name);
+    user.setEmail(editForm.email);
+    setUser({ ...user });
     setShowEditModal(false);
   };
 
@@ -320,23 +337,33 @@ function App() {
               type="text" 
               placeholder="Full Name"
               style={{width:'100%', padding:'0.9rem', marginBottom:'1rem', borderRadius:'8px', border:'1px solid #ddd'}}
+              value={landingRegisterForm.name}
+              onChange={(e) => setLandingRegisterForm({...landingRegisterForm, name: e.target.value})}
             />
             <input 
               type="email" 
               placeholder="Email Address"
               style={{width:'100%', padding:'0.9rem', marginBottom:'1rem', borderRadius:'8px', border:'1px solid #ddd'}}
+              value={landingRegisterForm.email}
+              onChange={(e) => setLandingRegisterForm({...landingRegisterForm, email: e.target.value})}
             />
             <input 
               type="password" 
               placeholder="Password"
               style={{width:'100%', padding:'0.9rem', marginBottom:'1.5rem', borderRadius:'8px', border:'1px solid #ddd'}}
+              value={landingRegisterForm.password}
+              onChange={(e) => setLandingRegisterForm({...landingRegisterForm, password: e.target.value})}
             />
 
             <button 
               className="btn-hero"
               style={{width:'100%', padding:'1rem', fontSize:'1.1rem'}}
               onClick={() => {
-                handleRegister('New Student', 'new@user.com', '123456');
+                if (landingRegisterForm.name && landingRegisterForm.email && landingRegisterForm.password) {
+                  handleRegister(landingRegisterForm.name, landingRegisterForm.email, landingRegisterForm.password);
+                } else {
+                  alert("⚠️ Please fill in all fields!");
+                }
               }}
             >
               Register Now
@@ -351,7 +378,7 @@ function App() {
 
             <button 
               onClick={() => setCurrentPage('home')}
-              style={{marginTop:'1rem', background:'none', border:'none', color:'666', cursor:'pointer'}}
+              style={{marginTop:'1rem', background:'none', border:'none', color:'#666', cursor:'pointer'}}
             >
               Skip & Browse First
             </button>
@@ -362,35 +389,36 @@ function App() {
       {currentPage === 'home' && (
         <>
           <section className="hero">
-          <section style={{
-  maxWidth: '1000px',
-  margin: '2rem auto',
-  padding: '2rem',
-  background: 'rgba(255,255,255,0.9)',
-  borderRadius: '16px',
-  textAlign: 'center',
-  boxShadow: '0 4px 14px rgba(0,0,0,0.05)'
-}}>
-  <h2 style={{ marginBottom: '1rem', color: '#1f2937' }}>
-    🌏 Why Build Your Career in Sarawak?
-  </h2>
-
-  <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
-    Sarawak is rapidly growing with opportunities in technology, egngineering, healthcare and local industries. 
-    Instead of leaving, students can build meaningful careers locally with strong community impact.
-  </p>
-
-  <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-    <div>💻 Growing Digital Economy (PCDS)</div>
-    <div>🏭 Expanding Oil & Gas Sector</div>
-    <div>🏥 Increasing Healthcare Demand</div>
-    <div>📈 Strong SME & Business Opportunities</div>
-  </div>
-</section>
-
             <h1>Welcome to Mentor MY</h1>
             <p>Connect with experienced mentors, get academic guidance, and build your future career pathway — all in one platform.</p>
             <button className="btn-hero" onClick={() => setCurrentPage('mentors')}>Browse Mentors</button>
+
+            {/* 移到 Welcome 下面的 Sarawak 模块 */}
+            <section style={{
+              maxWidth: '1000px',
+              margin: '3rem auto 0 auto',
+              padding: '2rem',
+              background: 'rgba(255,255,255,0.9)',
+              borderRadius: '16px',
+              textAlign: 'center',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.05)'
+            }}>
+              <h2 style={{ marginBottom: '1rem', color: '#1f2937' }}>
+                🌏 Why Build Your Career in Sarawak?
+              </h2>
+
+              <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
+                Sarawak is rapidly growing with opportunities in technology, engineering, healthcare and local industries. 
+                Instead of leaving, students can build meaningful careers locally with strong community impact.
+              </p>
+
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+                <div>💻 Growing Digital Economy (PCDS)</div>
+                <div>🏭 Expanding Oil & Gas Sector</div>
+                <div>🏥 Increasing Healthcare Demand</div>
+                <div>📈 Strong SME & Business Opportunities</div>
+              </div>
+            </section>
           </section>
 
           <section className="mentors-section">
@@ -419,7 +447,8 @@ function App() {
                     <div className="lang">Languages: {m.lang}</div>
                     <div className="desc">{m.desc}</div>
                     <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.8rem' }}>
-                      <p>📍 {m.location} | 🏭 {m.industry} | 🏢 {m.company}</p> </div>
+                      <p>📍 {m.location} | 🏭 {m.industry} | 🏢 {m.company}</p> 
+                    </div>
                     <div className="card-actions">
                       <button className="btn-save" onClick={() => toggleSaveMentor(m)}>
                         {isMentorSaved(m.id) ? 'Unsave' : 'Save'}
@@ -480,7 +509,8 @@ function App() {
                   <div className="lang">Languages: {m.lang}</div>
                   <div className="desc">{m.desc}</div>
                   <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.8rem' }}>
-                      <p>📍 {m.location} | 🏭 {m.industry} | 🏢 {m.company}</p> </div>
+                      <p>📍 {m.location} | 🏭 {m.industry} | 🏢 {m.company}</p> 
+                  </div>
                   <div className="card-actions">
                     <button className="btn-save" onClick={() => toggleSaveMentor(m)}>
                       {isMentorSaved(m.id) ? 'Unsave' : 'Save'}
@@ -552,10 +582,10 @@ function App() {
             {/* Profile */}
             <div className="dashboard-card">
               <h3>My Profile</h3>
-              <p>Name: {user.getName}</p>
-              <p>Email: {user.getEmail}</p>
+              <p>Name: {user.getName()}</p>
+              <p>Email: {user.getEmail()}</p>
               <button className="dashboard-btn" onClick={() => {
-                setEditForm({ name: user.name, email: user.email });
+                setEditForm({ name: user.getName(), email: user.getEmail() });
                 setShowEditModal(true);
               }}>
                 Edit Profile
@@ -609,7 +639,8 @@ function App() {
                     <div className="lang">Languages: {m.lang}</div>
                     <div className="desc">{m.desc}</div>
                     <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.8rem' }}>
-                      <p>📍 {m.location} | 🏭 {m.industry} | 🏢 {m.company}</p> </div>
+                      <p>📍 {m.location} | 🏭 {m.industry} | 🏢 {m.company}</p> 
+                    </div>
                     <div className="card-actions">
                       <button className="btn-save" onClick={() => toggleSaveMentor(m)}>
                         Unsave
@@ -686,9 +717,19 @@ function App() {
         <div className="modal-overlay">
           <div className="modal">
             <h2>Login</h2>
-            <input type="email" placeholder="Email" />
-            <input type="password" placeholder="Password" />
-            <button className="modal-btn" onClick={() => handleLogin('test@user.com', '123456')}>Login</button>
+            <input 
+              type="email" 
+              placeholder="Email" 
+              value={loginForm.email}
+              onChange={(e) => setLoginForm({...loginForm, email: e.target.value})}
+            />
+            <input 
+              type="password" 
+              placeholder="Password" 
+              value={loginForm.password}
+              onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+            />
+            <button className="modal-btn" onClick={() => handleLogin(loginForm.email, loginForm.password)}>Login</button>
             <button className="modal-close" onClick={() => setShowLogin(false)}>Close</button>
           </div>
         </div>
@@ -698,10 +739,25 @@ function App() {
         <div className="modal-overlay">
           <div className="modal">
             <h2>Register</h2>
-            <input type="text" placeholder="Full Name" />
-            <input type="email" placeholder="Email" />
-            <input type="password" placeholder="Password" />
-            <button className="modal-btn" onClick={() => handleRegister('Student', 'student@test.com', '123456')}>Register</button>
+            <input 
+              type="text" 
+              placeholder="Full Name" 
+              value={registerForm.name}
+              onChange={(e) => setRegisterForm({...registerForm, name: e.target.value})}
+            />
+            <input 
+              type="email" 
+              placeholder="Email" 
+              value={registerForm.email}
+              onChange={(e) => setRegisterForm({...registerForm, email: e.target.value})}
+            />
+            <input 
+              type="password" 
+              placeholder="Password" 
+              value={registerForm.password}
+              onChange={(e) => setRegisterForm({...registerForm, password: e.target.value})}
+            />
+            <button className="modal-btn" onClick={() => handleRegister(registerForm.name, registerForm.email, registerForm.password)}>Register</button>
             <button className="modal-close" onClick={() => setShowRegister(false)}>Close</button>
           </div>
         </div>
@@ -711,9 +767,18 @@ function App() {
         <div className="modal-overlay">
           <div className="modal">
             <h2>Book {selectedMentor.name}</h2>
-            <input type="date" />
-            <input type="text" placeholder="Topic you want to learn" />
-            <button className="modal-btn" onClick={() => handleBook(selectedMentor, '2026-05-01', 'Career Guidance')}>
+            <input 
+              type="date" 
+              value={bookingForm.date}
+              onChange={(e) => setBookingForm({...bookingForm, date: e.target.value})}
+            />
+            <input 
+              type="text" 
+              placeholder="Topic you want to learn" 
+              value={bookingForm.topic}
+              onChange={(e) => setBookingForm({...bookingForm, topic: e.target.value})}
+            />
+            <button className="modal-btn" onClick={() => handleBook(selectedMentor, bookingForm.date, bookingForm.topic)}>
               Confirm Booking
             </button>
             <button className="modal-close" onClick={() => setShowBookModal(false)}>Cancel</button>
