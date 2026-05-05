@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/Chicken060127/static/css/main.0218efd0.css",
+    "main.js": "/Chicken060127/static/js/main.c6a45256.js",
+    "index.html": "/Chicken060127/index.html",
+    "main.0218efd0.css.map": "/Chicken060127/static/css/main.0218efd0.css.map",
+    "main.c6a45256.js.map": "/Chicken060127/static/js/main.c6a45256.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0218efd0.css",
+    "static/js/main.c6a45256.js"
+  ]
+}
