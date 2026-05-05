@@ -1,935 +1,198 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-// ========== Inheritance & Polymorphism (Teacher Requirement) ==========
+// ==============================
+// 🔥 YOUR FULL DATABASE (from your docx)
+// 直接对接你的 6 张表
+// ==============================
+const DATABASE = {
+  Users: [
+    { User_ID: 'U001', Name: 'Alice Ting', Email: 'alice@student.com', Password: 'alice123', Role: 'Student' },
+    { User_ID: 'U002', Name: 'Brandon Ling', Email: 'brandon@student.com', Password: 'brandon123', Role: 'Student' },
+    { User_ID: 'U003', Name: 'Sarah Jabu', Email: 'sarah@mentor.com', Password: 'sarah123', Role: 'Mentor' },
+    { User_ID: 'U004', Name: 'Daniel Wong', Email: 'daniel@mentor.com', Password: 'daniel123', Role: 'Mentor' },
+    { User_ID: 'U005', Name: 'Fatimah Ahmad', Email: 'fatimah@mentor.com', Password: 'pass556', Role: 'Mentor' },
+    { User_ID: 'U006', Name: 'Kevin Baru', Email: 'kevin@mentor.com', Password: 'kb_2026', Role: 'Mentor' },
+    { User_ID: 'U007', Name: 'Chlos Sim', Email: 'chloe@student.com', Password: 'csim99', Role: 'Student' },
+    { User_ID: 'U008', Name: 'Mohamad Ali', Email: 'ali@mentor.com', Password: 'm_ali88', Role: 'Mentor' },
+    { User_ID: 'U009', Name: 'Jessica Low', Email: 'jess@student.com', Password: 'jlow_ps', Role: 'Student' },
+    { User_ID: 'U010', Name: 'Harrison Page', Email: 'hp@mentor.com', Password: 'hpage77', Role: 'Mentor' },
+    { User_ID: 'U011', Name: 'Lim Wei', Email: 'lim@student.com', Password: 'ocean123', Role: 'Student' },
+    { User_ID: 'U012', Name: 'Nurul Izzah', Email: 'nurul@mentor.com', Password: 'starLight', Role: 'Mentor' },
+    { User_ID: 'U013', Name: 'Michael Scott', Email: 'mike@student.com', Password: 'office44', Role: 'Student' },
+    { User_ID: 'U014', Name: 'Emily Blunt', Email: 'emily@student.com', Password: 'quietPlace', Role: 'Student' },
+    { User_ID: 'U015', Name: 'Rajiv Kumar', Email: 'rajiv@mentor.com', Password: 'bridge00', Role: 'Mentor' },
+    { User_ID: 'U016', Name: 'Siti Aminah', Email: 'siti@student.com', Password: 'moon66', Role: 'Student' },
+    { User_ID: 'U017', Name: 'Dave Grohl', Email: 'dave@student.com', Password: 'guitar11', Role: 'Mentor' },
+    { User_ID: 'U018', Name: 'Fiona Apple', Email: 'fiona@student.com', Password: 'piano33', Role: 'Student' },
+    { User_ID: 'U019', Name: 'Gary Vayner', Email: 'gary@mentor.com', Password: 'hustle88', Role: 'Mentor' },
+    { User_ID: 'U020', Name: 'Hannah Tan', Email: 'hannah@student.com', Password: 'yellow55', Role: 'Student' },
+  ],
+
+  Students: [
+    { Student_ID: 'S001', User_ID: 'U001', University: 'Swinburne University', Field_of_Study: 'Computer Science', Year_of_Study: 'Year 3' },
+    { Student_ID: 'S002', User_ID: 'U002', University: 'UNIMAS', Field_of_Study: 'Business & Accounting', Year_of_Study: 'Year 2' },
+    { Student_ID: 'S003', User_ID: 'U007', University: 'UTS', Field_of_Study: 'Engineering', Year_of_Study: 'Year 1' },
+    { Student_ID: 'S004', User_ID: 'U009', University: 'Curtin Malaysia', Field_of_Study: 'Medical & Healthcare', Year_of_Study: 'Year 3' },
+    { Student_ID: 'S005', User_ID: 'U013', University: 'Swinburne University', Field_of_Study: 'Computer Science', Year_of_Study: 'Year 2' },
+    { Student_ID: 'S006', User_ID: 'U014', University: 'UiTM', Field_of_Study: 'Business & Accounting', Year_of_Study: 'Year 4' },
+    { Student_ID: 'S007', User_ID: 'U015', University: 'UNIMAS', Field_of_Study: 'Engineering', Year_of_Study: 'Year 2' },
+    { Student_ID: 'S008', User_ID: 'U016', University: 'Sunway University', Field_of_Study: 'Medical & Healthcare', Year_of_Study: 'Year 1' },
+    { Student_ID: 'S009', User_ID: 'U017', University: 'Swinburne University', Field_of_Study: 'Computer Science', Year_of_Study: 'Year 2' },
+    { Student_ID: 'S010', User_ID: 'U018', University: 'Monash Malaysia', Field_of_Study: 'Business & Accounting', Year_of_Study: 'Year 3' },
+  ],
+
+  Mentors: [
+    { Mentor_ID: 'M001', User_ID: 'U003', Company: 'SDEC', Job_Title: 'Software Engineer', Expertise: 'Computer Science', Verified_Status: 'YES', Profile_URL: 'https://mockmind-api.uifaces.co/content/human/128.jpg' },
+    { Mentor_ID: 'M002', User_ID: 'U004', Company: 'Local Energy Company', Job_Title: 'Data Scientist', Expertise: 'Data Science / Engineering', Verified_Status: 'YES', Profile_URL: 'https://mockmind-api.uifaces.co/content/human/91.jpg' },
+    { Mentor_ID: 'M003', User_ID: 'U005', Company: 'Local Business Consultant', Job_Title: 'Business Advisor', Expertise: 'Business & Accounting', Verified_Status: 'YES', Profile_URL: 'https://mockmind-api.uifaces.co/content/human/218.jpg' },
+    { Mentor_ID: 'M004', User_ID: 'U006', Company: 'Industrial Engineering Firm', Job_Title: 'Engineer', Expertise: 'Engineering', Verified_Status: 'YES', Profile_URL: 'https://mockmind-api.uifaces.co/content/human/102.jpg' },
+    { Mentor_ID: 'M005', User_ID: 'U007', Company: 'Local Healthcare Centre', Job_Title: 'Medical Officer', Expertise: 'Medical & Healthcare', Verified_Status: 'YES', Profile_URL: 'https://mockmind-api.uifaces.co/content/human/98.jpg' },
+    { Mentor_ID: 'M006', User_ID: 'U008', Company: 'Local Creative Studio', Job_Title: 'UI/UX Designer', Expertise: 'Computer Science / Design', Verified_Status: 'YES', Profile_URL: 'https://mockmind-api.uifaces.co/content/human/214.jpg' },
+  ],
+
+  Bookings: [
+    { Booking_ID: 'B001', Student_ID: 'S001', Mentor_ID: 'M001', Booking_Date: '2026-05-10', Booking_Time: '10:00 AM', Topic: 'Career in Software Development', Status: 'Pending' },
+    { Booking_ID: 'B002', Student_ID: 'S002', Mentor_ID: 'M002', Booking_Date: '2026-05-12', Booking_Time: '2:30 PM', Topic: 'UI/UX Career Guidance', Status: 'Approved' },
+    { Booking_ID: 'B003', Student_ID: 'S003', Mentor_ID: 'M005', Booking_Date: '2026-05-15', Booking_Time: '09:00 AM', Topic: 'Freelancing Tips', Status: 'Pending' },
+    { Booking_ID: 'B004', Student_ID: 'S001', Mentor_ID: 'M003', Booking_Date: '2026-04-20', Booking_Time: '11:00 AM', Topic: 'Mock Interview', Status: 'Completed' },
+    { Booking_ID: 'B005', Student_ID: 'S004', Mentor_ID: 'M006', Booking_Date: '2026-05-18', Booking_Time: '04:00 PM', Topic: 'IT Infrastructure', Status: 'Approved' },
+  ],
+
+  Saved_Mentors: [
+    { Saved_ID: 'SV001', Student_ID: 'S001', Mentor_ID: 'M001', Date_Saved: '2026-04-01' },
+    { Saved_ID: 'SV002', Student_ID: 'S001', Mentor_ID: 'M003', Date_Saved: '2026-04-05' },
+    { Saved_ID: 'SV003', Student_ID: 'S002', Mentor_ID: 'M002', Date_Saved: '2026-04-10' },
+    { Saved_ID: 'SV004', Student_ID: 'S003', Mentor_ID: 'M005', Date_Saved: '2026-04-12' },
+    { Saved_ID: 'SV005', Student_ID: 'S004', Mentor_ID: 'M001', Date_Saved: '2026-04-15' },
+  ],
+
+  Career_Pathways: [
+    { Path_ID: 'P001', Field_Name: 'Computer Science', Stage_Name: 'Intern', Description: 'Learn basic programming, web & app fundamentals' },
+    { Path_ID: 'P002', Field_Name: 'Computer Science', Stage_Name: 'Junior Developer', Description: 'Build websites, apps and small software systems' },
+    { Path_ID: 'P003', Field_Name: 'Computer Science', Stage_Name: 'Specialist', Description: 'Focus on AI, data, cybersecurity or cloud' },
+    { Path_ID: 'P004', Field_Name: 'Computer Science', Stage_Name: 'Senior Engineer', Description: 'Lead projects, design systems & mentor juniors' },
+    { Path_ID: 'P005', Field_Name: 'Business & Accounting', Stage_Name: 'Intern', Description: 'Learn basic accounting, marketing & office work' },
+    { Path_ID: 'P006', Field_Name: 'Business & Accounting', Stage_Name: 'Junior Executive', Description: 'Handle finance, sales, admin or business support' },
+    { Path_ID: 'P007', Field_Name: 'Business & Accounting', Stage_Name: 'Specialist', Description: 'Manage accounts, audit or business operations' },
+    { Path_ID: 'P008', Field_Name: 'Business & Accounting', Stage_Name: 'Senior Officer', Description: 'Lead teams, planning & financial strategy' },
+    { Path_ID: 'P009', Field_Name: 'Engineering', Stage_Name: 'Intern', Description: 'Learn technical drawing, tools & site basics' },
+    { Path_ID: 'P010', Field_Name: 'Engineering', Stage_Name: 'Junior Engineer', Description: 'Assist in design, construction & maintenance' },
+    { Path_ID: 'P011', Field_Name: 'Engineering', Stage_Name: 'Specialist', Description: 'Focus on electrical, mechanical or civil work' },
+    { Path_ID: 'P012', Field_Name: 'Engineering', Stage_Name: 'Professional Engineer', Description: 'Certified expert for project approval & management' },
+    { Path_ID: 'P013', Field_Name: 'Medical & Healthcare', Stage_Name: 'Intern', Description: 'Clinical practice, hospital attachment & patient care' },
+    { Path_ID: 'P014', Field_Name: 'Medical & Healthcare', Stage_Name: 'Junior Medical Officer', Description: 'Work in clinics, hospitals & health departments' },
+    { Path_ID: 'P015', Field_Name: 'Medical & Healthcare', Stage_Name: 'Specialist', Description: 'Doctor, nurse, pharmacist or medical lab expert' },
+    { Path_ID: 'P016', Field_Name: 'Medical & Healthcare', Stage_Name: 'Junior Consultant', Description: 'Lead healthcare teams & specialized treatment' },
+  ]
+};
+
+// ==============================
+// OOP CLASS (Teacher Requirement)
+// ==============================
 class User {
   #name;
   #email;
-  #phone;
-  #school;
-  #bio;
+  #role;
+  #userId;
 
-  constructor(name, email, phone = '', school = '', bio = '') {
+  constructor(userId, name, email, role) {
+    this.#userId = userId;
     this.#name = name;
     this.#email = email;
-    this.#phone = phone;
-    this.#school = school;
-    this.#bio = bio;
+    this.#role = role;
   }
 
   getName() { return this.#name; }
-  setName(name) { this.#name = name; }
-
   getEmail() { return this.#email; }
-  setEmail(email) { this.#email = email; }
-
-  getPhone() { return this.#phone; }
-  setPhone(phone) { this.#phone = phone; }
-
-  getSchool() { return this.#school; }
-  setSchool(school) { this.#school = school; }
-
-  getBio() { return this.#bio; }
-  setBio(bio) { this.#bio = bio; }
-
-  getRoleInfo() {
-    return "General Platform User";
-  }
+  getRole() { return this.#role; }
+  getUserId() { return this.#userId; }
 }
 
-// Inheritance: Student
-class Student extends User {
-  getRoleInfo() {
-    return "Student: Can search, save and book mentors";
-  }
-}
+class Student extends User {}
+class Mentor extends User {}
 
-// Inheritance: Mentor
-class Mentor extends User {
-  getRoleInfo() {
-    return "Mentor: Provides Sarawak career and study guidance";
-  }
-}
-
-// Polymorphism demo
-const user1 = new Student("Student Aisha", "student@mail.com");
-const user2 = new Mentor("Mentor Daniel", "mentor@mail.com");
-
-// ========== LocalStorage User Authentication ==========
-const saveUserToDB = (name, email, password) => {
-  const users = JSON.parse(localStorage.getItem('mentorMY_users') || '[]');
-  users.push({ name, email, password });
-  localStorage.setItem('mentorMY_users', JSON.stringify(users));
-};
-
-const validateLogin = (email, password) => {
-  const users = JSON.parse(localStorage.getItem('mentorMY_users') || '[]');
-  return users.find(u => u.email === email && u.password === password);
-};
-
+// ==============================
+// MAIN APP
+// ==============================
 function App() {
   const [currentPage, setCurrentPage] = useState('landing');
   const [user, setUser] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
-  const [showRegister, setShowRegister] = useState(false);
-  const [showBookModal, setShowBookModal] = useState(false);
-  const [selectedMentor, setSelectedMentor] = useState(null);
-  const [bookings, setBookings] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedPathway, setSelectedPathway] = useState(null);
-
-  // 新增：包含 phone / school / bio 的 editForm
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editForm, setEditForm] = useState({ 
-    name: '', 
-    email: '', 
-    phone: '', 
-    school: '', 
-    bio: '' 
-  });
-
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
-  const [registerForm, setRegisterForm] = useState({ name: '', email: '', password: '' });
-  const [landingRegisterForm, setLandingRegisterForm] = useState({ name: '', email: '', password: '' });
-  const [bookingForm, setBookingForm] = useState({ date: '', topic: '' });
+  const [editForm, setEditForm] = useState({ name: '', email: '', phone: '', school: '', bio: '' });
 
-  const [savedMentors, setSavedMentors] = useState([]);
-
-  // OOP log only once
-  useEffect(() => {
-    console.log(user1.getName(), "-", user1.getRoleInfo());
-    console.log(user2.getName(), "-", user2.getRoleInfo());
-  }, []);
-
-  const allMentors = [
-    {
-      id: 1,
-      name: 'Aisha Tan',
-      major: 'Computer Science',
-      lang: 'English, Malay',
-      rating: 4.9,
-      location: 'Kuching',
-      industry: 'Tech',
-      company: 'Sarawak Digital Economy',
-      desc: 'Guidance on web development and tech careers in Sarawak.'
-    },
-    {
-      id: 2,
-      name: 'Daniel Lee',
-      major: 'Data Science',
-      lang: 'English, Malay',
-      rating: 4.8,
-      location: 'Miri',
-      industry: 'Data / Oil & Gas',
-      company: 'Local Energy Company',
-      desc: 'Guidance on Python, data analysis and data careers linked to local industries.'
-    },
-    {
-      id: 3,
-      name: 'Priya Nair',
-      major: 'Business',
-      lang: 'English, Malay, Tamil',
-      rating: 4.7,
-      location: 'Sibu',
-      industry: 'Business / SME',
-      company: 'Local Business Consultant',
-      desc: 'Guidance on business studies, accounting and starting careers in local companies.'
-    },
-    {
-      id: 4,
-      name: 'Muhammad Amir',
-      major: 'Engineering',
-      lang: 'English, Malay',
-      rating: 4.6,
-      location: 'Bintulu',
-      industry: 'Engineering / Energy',
-      company: 'Industrial Engineering Firm',
-      desc: 'Guidance on engineering study paths and industrial career opportunities in Sarawak.'
-    },
-    {
-      id: 5,
-      name: 'Siti Hajar',
-      major: 'Medicine',
-      lang: 'English, Malay',
-      rating: 4.9,
-      location: 'Kuching',
-      industry: 'Healthcare',
-      company: 'Local Healthcare Centre',
-      desc: 'Guidance on medical entry, healthcare study routes and serving local communities.'
-    },
-    {
-      id: 6,
-      name: 'Lim Wei',
-      major: 'Design',
-      lang: 'English, Mandarin',
-      rating: 4.7,
-      location: 'Kuching',
-      industry: 'Creative / UIUX',
-      company: 'Local Creative Studio',
-      desc: 'Guidance on graphic design, UI/UX portfolio and creative jobs in Sarawak.'
-    }
-  ];
-
-  const pathways = [
-    {
-      id: 1,
-      title: 'Computer Science',
-      icon: '💻',
-      desc: 'Build software, apps, websites and AI systems.',
-      demand: '🔥 High demand in Sarawak Digital Economy (PCDS)',
-      skills: ['Python', 'JavaScript', 'Java', 'SQL', 'UI/UX'],
-      jobs: ['Software Engineer', 'Web Developer', 'Data Scientist', 'AI Engineer', 'Cybersecurity'],
-      steps: [
-        { title: 'Learn Basics', desc: 'Python, logic, algorithms' },
-        { title: 'Build Projects', desc: 'Websites, apps, small systems' },
-        { title: 'Specialize', desc: 'AI, mobile, security, data' },
-        { title: 'Internship', desc: 'Gain real working experience' },
-      ]
-    },
-    {
-      id: 2,
-      title: 'Business & Accounting',
-      icon: '📊',
-      desc: 'Manage businesses, finance, marketing and teams.',
-      demand: '📈 Strong demand in local SMEs and entrepreneurship',
-      skills: ['Accounting', 'Marketing', 'Economics', 'Management', 'Excel'],
-      jobs: ['Accountant', 'Marketing Executive', 'Business Analyst', 'Bank Officer', 'Manager'],
-      steps: [
-        { title: 'Foundations', desc: 'Accounting, economics, math' },
-        { title: 'Specialize', desc: 'Finance, marketing, HR, management' },
-        { title: 'Intern', desc: 'Work in company or bank' },
-        { title: 'Professional Cert', desc: 'ACCA, CIMA, ICSA' },
-      ]
-    },
-    {
-      id: 3,
-      title: 'Engineering',
-      icon: '🔧',
-      desc: 'Design, build and maintain electrical, mechanical & civil systems.',
-      demand: '⚡ High demand in oil, gas and infrastructure sectors (Bintulu/Miri)',
-      skills: ['Math', 'Physics', 'CAD', 'Circuits', 'Mechanics'],
-      jobs: ['Electrical Engineer', 'Mechanical Engineer', 'Civil Engineer', 'Tech Consultant'],
-      steps: [
-        { title: 'Strong Math & Physics', desc: 'Foundation for all engineering' },
-        { title: 'Software Skills', desc: 'CAD, simulation, analysis' },
-        { title: 'Lab & Workshop', desc: 'Hands-on practical training' },
-        { title: 'Professional Engineer License', desc: 'Board certification' },
-      ]
-    },
-    {
-      id: 4,
-      title: 'Medical & Healthcare',
-      icon: '🩺',
-      desc: 'Pursue medicine, nursing, pharmacy and health-related careers.',
-      demand: '🏥 Continuous demand in Sarawak healthcare services',
-      skills: ['Biology', 'Chemistry', 'Medical Science', 'Patient Care', 'Research'],
-      jobs: ['Doctor', 'Nurse', 'Pharmacist', 'Medical Lab Tech', 'Healthcare Officer'],
-      steps: [
-        { title: 'Strong Science Base', desc: 'Biology, chemistry, pre-med foundation' },
-        { title: 'Specialize & Practice', desc: 'Medicine, nursing, pharmacy training' },
-        { title: 'Clinical Attachment', desc: 'Hospital & healthcare practical' },
-        { title: 'Professional Registration', desc: 'Medical board certification' },
-      ]
-    }
-  ];
-
-  const filteredMentors = allMentors.filter(m =>
-    m.major.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    m.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // ========== Auth Functions ==========
+  // ==============================
+  // ✅ LOGIN USING YOUR DATABASE
+  // ==============================
   const handleLogin = (email, password) => {
-    const foundUser = validateLogin(email, password);
+    const foundUser = DATABASE.Users.find(u => u.Email === email && u.Password === password);
+
     if (!foundUser) {
-      alert("❌ Email or password incorrect! Please register first.");
+      alert("❌ Email / Password wrong (FROM DATABASE)");
       return;
     }
-    const newUser = new Student(foundUser.name, foundUser.email);
-    setUser(newUser);
-    setShowLogin(false);
-    setLoginForm({ email: '', password: '' });
-    setCurrentPage('home');
-  };
 
-  const handleRegister = (name, email, password) => {
-    const users = JSON.parse(localStorage.getItem('mentorMY_users') || '[]');
-    if (users.some(u => u.email === email)) {
-      alert("❌ This email is already registered!");
-      return;
-    }
-    saveUserToDB(name, email, password);
-    setLandingRegisterForm({ name: '', email: '', password: '' });
-    setRegisterForm({ name: '', email: '', password: '' });
-    alert("✅ Register successful! Please login now.");
-    setShowLogin(true);
-  };
-
-  const handleBook = (mentor, date, topic) => {
-    if (!date || !topic) {
-      alert("⚠️ Please fill in both date and topic!");
-      return;
-    }
-    const newBooking = {
-      id: Date.now(),
-      mentorName: mentor.name,
-      date,
-      topic,
-      status: 'Upcoming'
-    };
-    setBookings([...bookings, newBooking]);
-    setShowBookModal(false);
-    setBookingForm({ date: '', topic: '' });
-    alert("✅ Booking successful!");
-  };
-
-  const cancelBooking = (id) => {
-    setBookings(bookings.filter(b => b.id !== id));
-  };
-
-  const goToMentorsByMajor = (major) => {
-    setSearchTerm(major);
-    setCurrentPage('mentors');
-    setSelectedPathway(null);
-  };
-
-  // ========== 新的 handleSaveEdit（更新所有字段） ==========
-  const handleSaveEdit = () => {
-    user.setName(editForm.name);
-    user.setEmail(editForm.email);
-    user.setPhone(editForm.phone);
-    user.setSchool(editForm.school);
-    user.setBio(editForm.bio);
-    setUser({ ...user });
-    setShowEditModal(false);
-  };
-
-  const toggleSaveMentor = (mentor) => {
-    const isSaved = savedMentors.some(m => m.id === mentor.id);
-    if (isSaved) {
-      setSavedMentors(savedMentors.filter(m => m.id !== mentor.id));
+    if (foundUser.Role === "Student") {
+      setUser(new Student(foundUser.User_ID, foundUser.Name, foundUser.Email, foundUser.Role));
     } else {
-      setSavedMentors([...savedMentors, mentor]);
+      setUser(new Mentor(foundUser.User_ID, foundUser.Name, foundUser.Email, foundUser.Role));
     }
+
+    setShowLogin(false);
+    setCurrentPage('home');
+    alert("✅ Login success with DATABASE account!");
   };
 
-  const isMentorSaved = (mentorId) => {
-    return savedMentors.some(m => m.id === mentorId);
+  // Get student info from DB
+  const getStudentData = () => {
+    if (!user || user.getRole() !== "Student") return null;
+    return DATABASE.Students.find(s => s.User_ID === user.getUserId());
   };
 
+  // ==============================
+  // RENDER
+  // ==============================
   return (
-    <div className="App">
-      <nav className="navbar">
-        <div className="logo">Mentor MY</div>
-        <ul className="nav-links">
-          <li>
-            <button 
-              className="nav-btn" 
-              onClick={() => user ? setCurrentPage('home') : alert("⚠️ Please register or login first!")}
-            >
-              Home
-            </button>
-          </li>
-          <li>
-            <button 
-              className="nav-btn" 
-              onClick={() => user ? setCurrentPage('mentors') : alert("⚠️ Please register or login first!")}
-            >
-              Mentors
-            </button>
-          </li>
-          <li>
-            <button 
-              className="nav-btn" 
-              onClick={() => user ? setCurrentPage('careers') : alert("⚠️ Please register or login first!")}
-            >
-              Career Pathways
-            </button>
-          </li>
-          <li>
-            <button 
-              className="nav-btn" 
-              onClick={() => user ? setCurrentPage('about') : alert("⚠️ Please register or login first!")}
-            >
-              About
-            </button>
-          </li>
-        </ul>
-        <div className="auth-buttons">
-          {user ? (
-            <>
-              <button className="nav-btn" onClick={() => setCurrentPage('dashboard')}>Dashboard</button>
-              <button className="btn-logout" onClick={() => setUser(null)}>Logout</button>
-            </>
-          ) : (
-            <>
-              <button className="btn-login" onClick={() => setShowLogin(true)}>Login</button>
-              <button className="btn-register" onClick={() => setShowRegister(true)}>Register</button>
-            </>
-          )}
-        </div>
+    <div className="App" style={{ padding: 20, fontFamily: 'Arial' }}>
+      <nav style={{ marginBottom: 20 }}>
+        <h1>Mentor MY (Connected to YOUR Database)</h1>
+        {!user ? (
+          <button onClick={() => setShowLogin(true)} style={{ padding: 8 }}>Login with DB Account</button>
+        ) : (
+          <button onClick={() => setUser(null)} style={{ padding: 8 }}>Logout</button>
+        )}
       </nav>
 
-      {/* 未登录：只显示注册页 */}
-      {!user && (
-        <section style={{
-          minHeight: '80vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '2rem'
-        }}>
-          <div style={{
-            backgroundColor: 'rgba(255,255,255,0.9)',
-            padding: '3rem',
-            borderRadius: '20px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
-            width: '100%',
-            maxWidth: '450px',
-            textAlign: 'center'
-          }}>
-            <h1 style={{fontSize: '2rem', marginBottom: '0.5rem'}}>Join Mentor MY 🎓</h1>
-            <p style={{color: '#666', marginBottom: '2rem'}}>Create your account to find your perfect mentor today</p>
-
-            <input 
-              type="text" 
-              placeholder="Full Name"
-              style={{width:'100%', padding:'0.9rem', marginBottom:'1rem', borderRadius:'8px', border:'1px solid #ddd'}}
-              value={landingRegisterForm.name}
-              onChange={(e) => setLandingRegisterForm({...landingRegisterForm, name: e.target.value})}
-            />
-            <input 
-              type="email" 
-              placeholder="Email Address"
-              style={{width:'100%', padding:'0.9rem', marginBottom:'1rem', borderRadius:'8px', border:'1px solid #ddd'}}
-              value={landingRegisterForm.email}
-              onChange={(e) => setLandingRegisterForm({...landingRegisterForm, email: e.target.value})}
-            />
-            <input 
-              type="password" 
-              placeholder="Password"
-              style={{width:'100%', padding:'0.9rem', marginBottom:'1.5rem', borderRadius:'8px', border:'1px solid #ddd'}}
-              value={landingRegisterForm.password}
-              onChange={(e) => setLandingRegisterForm({...landingRegisterForm, password: e.target.value})}
-            />
-
-            <button 
-              className="btn-hero"
-              style={{width:'100%', padding:'1rem', fontSize:'1.1rem'}}
-              onClick={() => {
-                if (landingRegisterForm.name && landingRegisterForm.email && landingRegisterForm.password) {
-                  handleRegister(landingRegisterForm.name, landingRegisterForm.email, landingRegisterForm.password);
-                } else {
-                  alert("⚠️ Please fill in all fields!");
-                }
-              }}
-            >
-              Register Now
-            </button>
-
-            <p style={{marginTop:'1.5rem'}}>
-              Already have an account? 
-              <button onClick={() => setShowLogin(true)} style={{color:'#4f46e5', fontWeight:'bold', marginLeft:'0.3rem', background:'none', border:'none', cursor:'pointer'}}>
-                Login here
-              </button>
-            </p>
-          </div>
-        </section>
-      )}
-
-      {/* 已登录才可以看所有页面 */}
-      {user && currentPage === 'home' && (
-        <>
-          <section className="hero">
-            <h1>Welcome to Mentor MY</h1>
-            <p>Connect with experienced mentors, get academic guidance, and build your future career pathway — all in one platform.</p>
-            <button className="btn-hero" onClick={() => setCurrentPage('mentors')}>Browse Mentors</button>
-
-            <section style={{
-              maxWidth: '1000px',
-              margin: '3rem auto 0 auto',
-              padding: '2rem',
-              background: 'rgba(255,255,255,0.9)',
-              borderRadius: '16px',
-              textAlign: 'center',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.05)'
-            }}>
-              <h2 style={{ marginBottom: '1rem', color: '#1f2937' }}>
-                🌏 Why Build Your Career in Sarawak?
-              </h2>
-              <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
-                Sarawak is rapidly growing with opportunities in technology, engineering, healthcare and local industries. 
-                Instead of leaving, students can build meaningful careers locally with strong community impact.
-              </p>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-                <div>💻 Growing Digital Economy (PCDS)</div>
-                <div>🏭 Expanding Oil & Gas Sector</div>
-                <div>🏥 Increasing Healthcare Demand</div>
-                <div>📈 Strong SME & Business Opportunities</div>
-              </div>
-            </section>
-          </section>
-
-          <section className="mentors-section">
-            <h2>Our Mentors</h2>
-            <p>Find experts in different fields to guide you.</p>
-            <div className="search-box">
-              <input
-                type="text"
-                placeholder="Search by major or name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="mentors-grid">
-              {filteredMentors.length > 0 ? (
-                filteredMentors.map(m => (
-                  <div className="mentor-card" key={m.id}>
-                    <div className="mentor-header">
-                      <div className="avatar">{m.name.charAt(0)}</div>
-                      <div className="mentor-info">
-                        <h3>{m.name}</h3>
-                        <div className="rating">⭐ {m.rating}</div>
-                      </div>
-                    </div>
-                    <div className="major">{m.major}</div>
-                    <div className="lang">Languages: {m.lang}</div>
-                    <div className="desc">{m.desc}</div>
-                    <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.8rem' }}>
-                      <p>📍 {m.location} | 🏭 {m.industry} | 🏢 {m.company}</p> 
-                    </div>
-                    <div className="card-actions">
-                      <button className="btn-save" onClick={() => toggleSaveMentor(m)}>
-                        {isMentorSaved(m.id) ? 'Unsave' : 'Save'}
-                      </button>
-                      <button className="btn-book" onClick={() => { setSelectedMentor(m); setShowBookModal(true); }}>
-                        Book Now
-                      </button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="no-result">No mentors found</div>
-              )}
-            </div>
-            <button className="btn-hero view-all-btn" onClick={() => setCurrentPage('mentors')}>View All Mentors</button>
-          </section>
-        </>
-      )}
-
-      {user && currentPage === 'mentors' && (
-        <section className="mentors-section">
-          <h2>All Mentors</h2>
-          <p>Find the best mentor for your study & career</p>
-          
-          <button className="btn-hero" onClick={() => setCurrentPage('home')} style={{ marginBottom: '1rem' }}>
-            Back to Home
-          </button>
-
-          <div className="search-box">
-            <input
-              type="text"
-              placeholder="Search major or name..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <div className="category-tags">
-            <div className="tag" onClick={() => setSearchTerm('')}>All</div>
-            <div className="tag" onClick={() => setSearchTerm('Computer Science')}>CS</div>
-            <div className="tag" onClick={() => setSearchTerm('Data Science')}>Data</div>
-            <div className="tag" onClick={() => setSearchTerm('Business')}>Business</div>
-            <div className="tag" onClick={() => setSearchTerm('Engineering')}>Engineering</div>
-            <div className="tag" onClick={() => setSearchTerm('Medicine')}>Medicine</div>
-            <div className="tag" onClick={() => setSearchTerm('Design')}>Design</div>
-          </div>
-          <div className="mentors-grid">
-            {filteredMentors.length > 0 ? (
-              filteredMentors.map(m => (
-                <div className="mentor-card" key={m.id}>
-                  <div className="mentor-header">
-                    <div className="avatar">{m.name.charAt(0)}</div>
-                    <div className="mentor-info">
-                      <h3>{m.name}</h3>
-                      <div className="rating">⭐ {m.rating}</div>
-                    </div>
-                  </div>
-                  <div className="major">{m.major}</div>
-                  <div className="lang">Languages: {m.lang}</div>
-                  <div className="desc">{m.desc}</div>
-                  <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.8rem' }}>
-                      <p>📍 {m.location} | 🏭 {m.industry} | 🏢 {m.company}</p> 
-                  </div>
-                  <div className="card-actions">
-                    <button className="btn-save" onClick={() => toggleSaveMentor(m)}>
-                      {isMentorSaved(m.id) ? 'Unsave' : 'Save'}
-                    </button>
-                    <button className="btn-book" onClick={() => { setSelectedMentor(m); setShowBookModal(true); }}>
-                      Book Now
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="no-result">No mentors found</div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {user && currentPage === 'careers' && (
-        <section className="careers-section">
-          <div className="careers-header">
-            <h2>Career Pathways</h2>
-            <p>Choose your field and know exactly what to do step by step</p>
-            <button className="btn-hero" onClick={() => setCurrentPage('home')} style={{ marginTop: '1rem' }}>
-              Back to Home
-            </button>
-          </div>
-          <div className="pathways-grid">
-            {pathways.map(p => (
-              <div className="path-card" key={p.id}>
-                <div className="path-icon">{p.icon}</div>
-                <h3>{p.title}</h3>
-                <div style={{ fontSize: '0.85rem', color: '#4f46e5', marginBottom: '1rem', fontWeight: '600' }}> 
-                  {p.demand} 
-                </div>
-                <div className="path-steps">
-                  {p.steps.slice(0, 2).map((s, i) => (
-                    <div className="step" key={i}>
-                      <div className="step-num">{i + 1}</div>
-                      <div className="step-content">
-                        <h4>{s.title}</h4>
-                        <p>{s.desc}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <button className="path-btn" onClick={() => setSelectedPathway(p)}>View Full Path</button>
-                <button
-                  className="path-btn mentor-path-btn"
-                  onClick={() => goToMentorsByMajor(p.title.split(' ')[0])}
-                >
-                  Find Mentor
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {user && currentPage === 'dashboard' && (
-        <section className="dashboard-section">
-          <div className="dashboard-header">
-            <h2>My Dashboard</h2>
-            <button className="btn-hero" onClick={() => setCurrentPage('home')}>
-              Back to Home
-            </button>
-          </div>
-
-          <div className="dashboard-grid">
-            <div className="dashboard-card">
-              <h3>My Profile</h3>
-              <p><strong>Name:</strong> {user.getName()}</p>
-              <p><strong>Email:</strong> {user.getEmail()}</p>
-              <p><strong>Phone:</strong> {user.getPhone() || 'Not set'}</p>
-              <p><strong>School/University:</strong> {user.getSchool() || 'Not set'}</p>
-              <p><strong>About Me:</strong> {user.getBio() || 'Not set'}</p>
-              <button className="dashboard-btn" onClick={() => {
-                setEditForm({ 
-                  name: user.getName(), 
-                  email: user.getEmail(), 
-                  phone: user.getPhone(), 
-                  school: user.getSchool(), 
-                  bio: user.getBio() 
-                });
-                setShowEditModal(true);
-              }}>
-                Edit Profile
-              </button>
-            </div>
-
-            <div className="dashboard-card">
-              <h3>My Bookings</h3>
-              {bookings.length === 0 ? (
-                <p>No bookings yet</p>
-              ) : (
-                <div className="bookings-list">
-                  {bookings.map(b => (
-                    <div className="booking-item" key={b.id}>
-                      <p><strong>Mentor:</strong> {b.mentorName}</p>
-                      <p><strong>Date:</strong> {b.date}</p>
-                      <p><strong>Topic:</strong> {b.topic}</p>
-                      <p className="status-upcoming">{b.status}</p>
-                      <button className="cancel-btn" onClick={() => cancelBooking(b.id)}>Cancel</button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <button className="dashboard-btn" onClick={() => setCurrentPage('mentors')}>
-                Book New Session
-              </button>
-            </div>
-          </div>
-
-          <div className="dashboard-section" style={{ marginTop: '2rem' }}>
-            <h3 style={{ marginBottom: '1.5rem', fontSize: '1.4rem' }}>Saved Mentors</h3>
-            {savedMentors.length === 0 ? (
-              <p style={{ color: '#6b7280', textAlign: 'center', padding: '1rem' }}>
-                You haven’t saved any mentors yet.
-              </p>
-            ) : (
-              <div className="mentors-grid">
-                {savedMentors.map(m => (
-                  <div className="mentor-card" key={m.id}>
-                    <div className="mentor-header">
-                      <div className="avatar">{m.name.charAt(0)}</div>
-                      <div className="mentor-info">
-                        <h3>{m.name}</h3>
-                        <div className="rating">⭐ {m.rating}</div>
-                      </div>
-                    </div>
-                    <div className="major">{m.major}</div>
-                    <div className="lang">Languages: {m.lang}</div>
-                    <div className="desc">{m.desc}</div>
-                    <div style={{ fontSize: '0.8rem', color: '#6b7280', marginBottom: '0.8rem' }}>
-                      <p>📍 {m.location} | 🏭 {m.industry} | 🏢 {m.company}</p> 
-                    </div>
-                    <div className="card-actions">
-                      <button className="btn-save" onClick={() => toggleSaveMentor(m)}>
-                        Unsave
-                      </button>
-                      <button className="btn-book" onClick={() => { setSelectedMentor(m); setShowBookModal(true); }}>
-                        Book Now
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {user && currentPage === 'about' && (
-        <section className="about-section" style={{padding: '3rem 1rem', maxWidth: '1000px', margin: '0 auto'}}>
-          <h2 style={{fontSize: '2.2rem', marginBottom: '1rem'}}>About Mentor MY</h2>
-          <p style={{maxWidth: '800px', margin: '0 auto 1rem auto', fontSize: '1.1rem', lineHeight: '1.8'}}>
-            Mentor MY is a dedicated student mentoring platform built for Malaysian secondary & pre-university students.
-          </p>
-          <p style={{maxWidth: '800px', margin: '0 auto 2.5rem auto', fontSize: '1.1rem', lineHeight: '1.8'}}>
-            We connect you with senior, experienced mentors across Computer Science, Business, Engineering, Medical and more.
-            Whether you are figuring out your SPM pathway, choosing university course, or planning your dream career,
-            we are here to guide you every step of the way.
-          </p>
-
-          <div className="pathways-grid" style={{marginBottom: '3rem'}}>
-            <div className="path-card">
-              <div className="path-icon">🎓</div>
-              <h4>Trusted Mentors</h4>
-              <p>Experienced seniors & industry experts</p>
-            </div>
-            <div className="path-card">
-              <div className="path-icon">🛤️</div>
-              <h4>Clear Career Roadmap</h4>
-              <p>Step-by-step pathway for every major</p>
-            </div>
-            <div className="path-card">
-              <div className="path-icon">🇲🇾</div>
-              <h4>Malaysia Focused</h4>
-              <p>Local courses, unis & job market</p>
-            </div>
-            <div className="path-card">
-              <div className="path-icon">💛</div>
-              <h4>Student First</h4>
-              <p>Friendly, simple & affordable guidance</p>
-            </div>
-          </div>
-
-          <button className="btn-hero" onClick={() => setCurrentPage('home')}>
-            Back to Home
-          </button>
-
-          <div className="contact-section" style={{marginTop: '4rem', padding: '2rem', borderRadius: '16px', backgroundColor: 'rgba(255,255,255,0.75)'}}>
-            <h2>Contact Us</h2>
-            <p style={{margin: '0.5rem 0'}}>📧 Email: support@mentormy.com</p>
-            <p style={{margin: '0.5rem 0'}}>📍 Location: Sibu, Sarawak, Malaysia</p>
-          </div>
-        </section>
-      )}
-
-      <section className="contact-section">
-        <h2>Contact Us</h2>
-        <p>Email: support@mentormy.com</p>
-        <p>Location: Sibu, Sarawak, Malaysia</p>
-      </section>
-
-      {/* All Modals */}
+      {/* LOGIN MODAL */}
       {showLogin && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Login</h2>
-            <input 
-              type="email" 
-              placeholder="Email" 
-              value={loginForm.email}
-              onChange={(e) => setLoginForm({...loginForm, email: e.target.value})}
-            />
-            <input 
-              type="password" 
-              placeholder="Password" 
-              value={loginForm.password}
-              onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
-            />
-            <button className="modal-btn" onClick={() => handleLogin(loginForm.email, loginForm.password)}>Login</button>
-            <button className="modal-close" onClick={() => setShowLogin(false)}>Close</button>
-          </div>
+        <div style={{ border: '1px solid #ccc', padding: 20, maxWidth: 400 }}>
+          <h3>Login (Verify from YOUR Database)</h3>
+          <input type="email" placeholder="Email" style={{ width: '100%', margin: 5, padding: 8 }}
+            onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })} />
+          <input type="password" placeholder="Password" style={{ width: '100%', margin: 5, padding: 8 }}
+            onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })} />
+          <button onClick={() => handleLogin(loginForm.email, loginForm.password)} style={{ padding: 8 }}>Login</button>
         </div>
       )}
 
-      {showRegister && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Register</h2>
-            <input 
-              type="text" 
-              placeholder="Full Name" 
-              value={registerForm.name}
-              onChange={(e) => setRegisterForm({...registerForm, name: e.target.value})}
-            />
-            <input 
-              type="email" 
-              placeholder="Email" 
-              value={registerForm.email}
-              onChange={(e) => setRegisterForm({...registerForm, email: e.target.value})}
-            />
-            <input 
-              type="password" 
-              placeholder="Password" 
-              value={registerForm.password}
-              onChange={(e) => setRegisterForm({...registerForm, password: e.target.value})}
-            />
-            <button className="modal-btn" onClick={() => handleRegister(registerForm.name, registerForm.email, registerForm.password)}>Register</button>
-            <button className="modal-close" onClick={() => setShowRegister(false)}>Close</button>
-          </div>
-        </div>
-      )}
+      {/* AFTER LOGIN SHOW PROFILE FROM DATABASE */}
+      {user && (
+        <div style={{ border: '1px solid #eee', padding: 20, maxWidth: 500 }}>
+          <h2>My Profile (From Database)</h2>
+          <p><strong>User ID:</strong> {user.getUserId()}</p>
+          <p><strong>Name:</strong> {user.getName()}</p>
+          <p><strong>Email:</strong> {user.getEmail()}</p>
+          <p><strong>Role:</strong> {user.getRole()}</p>
 
-      {showBookModal && selectedMentor && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Book {selectedMentor.name}</h2>
-            <input 
-              type="date" 
-              value={bookingForm.date}
-              onChange={(e) => setBookingForm({...bookingForm, date: e.target.value})}
-            />
-            <input 
-              type="text" 
-              placeholder="Topic you want to learn" 
-              value={bookingForm.topic}
-              onChange={(e) => setBookingForm({...bookingForm, topic: e.target.value})}
-            />
-            <button className="modal-btn" onClick={() => handleBook(selectedMentor, bookingForm.date, bookingForm.topic)}>
-              Confirm Booking
-            </button>
-            <button className="modal-close" onClick={() => setShowBookModal(false)}>Cancel</button>
-          </div>
-        </div>
-      )}
-
-      {selectedPathway && (
-        <div className="modal-overlay">
-          <div className="modal pathway-detail-modal">
-            <div className="detail-header">
-              <div className="detail-icon">{selectedPathway.icon}</div>
-              <h2>{selectedPathway.title}</h2>
-            </div>
-            <p className="detail-desc">{selectedPathway.desc}</p>
-
-            <div className="detail-section">
-              <h4>Key Skills</h4>
-              <div className="skill-tags">
-                {selectedPathway.skills.map((s, i) => (
-                  <div className="skill-tag" key={i}>{s}</div>
-                ))}
-              </div>
-            </div>
-
-            <div className="detail-section">
-              <h4>Career Options</h4>
-              <ul className="career-list">
-                {selectedPathway.jobs.map((j, i) => (
-                  <li key={i}>{j}</li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="detail-section">
-              <h4>Full Path Steps</h4>
-              {selectedPathway.steps.map((s, i) => (
-                <div className="step" key={i}>
-                  <div className="step-num">{i + 1}</div>
-                  <div className="step-content">
-                    <h4>{s.title}</h4>
-                    <p>{s.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <button
-              className="path-btn mentor-path-btn"
-              onClick={() => {
-                goToMentorsByMajor(selectedPathway.title.split(' ')[0]);
-              }}
-            >
-              Find Mentor for This Path
-            </button>
-            <button className="modal-close" onClick={() => setSelectedPathway(null)}>Close</button>
-          </div>
-        </div>
-      )}
-
-      {/* 新版 Edit Profile Modal，包含所有字段 */}
-      {showEditModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2>Edit Profile</h2>
-            <input
-              type="text"
-              placeholder="Your Name"
-              value={editForm.name}
-              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-            />
-            <input
-              type="email"
-              placeholder="Your Email"
-              value={editForm.email}
-              onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-            />
-            <input
-              type="tel"
-              placeholder="Phone Number (Optional)"
-              value={editForm.phone}
-              onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-            />
-            <input
-              type="text"
-              placeholder="School/University (Optional)"
-              value={editForm.school}
-              onChange={(e) => setEditForm({ ...editForm, school: e.target.value })}
-            />
-            <textarea
-              placeholder="About Me / Study Goals (Optional)"
-              value={editForm.bio}
-              onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
-              style={{ minHeight: '80px', width: '100%', padding: '0.9rem', borderRadius: '8px', border: '1px solid #ddd' }}
-            />
-            <button className="modal-btn" onClick={handleSaveEdit}>Save Changes</button>
-            <button className="modal-close" onClick={() => setShowEditModal(false)}>Close</button>
-          </div>
+          {getStudentData() && (
+            <>
+              <p><strong>University:</strong> {getStudentData().University}</p>
+              <p><strong>Field:</strong> {getStudentData().Field_of_Study}</p>
+              <p><strong>Year:</strong> {getStudentData().Year_of_Study}</p>
+            </>
+          )}
         </div>
       )}
     </div>
