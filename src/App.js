@@ -5,27 +5,32 @@ import './App.css';
 class User {
   #name;
   #email;
+  #phone;
+  #school;
+  #bio;
 
-  constructor(name, email) {
+  constructor(name, email, phone = '', school = '', bio = '') {
     this.#name = name;
     this.#email = email;
+    this.#phone = phone;
+    this.#school = school;
+    this.#bio = bio;
   }
 
-  getName() {
-    return this.#name;
-  }
+  getName() { return this.#name; }
+  setName(name) { this.#name = name; }
 
-  setName(name) {
-    this.#name = name;
-  }
+  getEmail() { return this.#email; }
+  setEmail(email) { this.#email = email; }
 
-  getEmail() {
-    return this.#email;
-  }
+  getPhone() { return this.#phone; }
+  setPhone(phone) { this.#phone = phone; }
 
-  setEmail(email) {
-    this.#email = email;
-  }
+  getSchool() { return this.#school; }
+  setSchool(school) { this.#school = school; }
+
+  getBio() { return this.#bio; }
+  setBio(bio) { this.#bio = bio; }
 
   getRoleInfo() {
     return "General Platform User";
@@ -73,8 +78,15 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPathway, setSelectedPathway] = useState(null);
 
+  // 新增：包含 phone / school / bio 的 editForm
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editForm, setEditForm] = useState({ name: '', email: '' });
+  const [editForm, setEditForm] = useState({ 
+    name: '', 
+    email: '', 
+    phone: '', 
+    school: '', 
+    bio: '' 
+  });
 
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [registerForm, setRegisterForm] = useState({ name: '', email: '', password: '' });
@@ -240,17 +252,13 @@ function App() {
     setCurrentPage('home');
   };
 
-  // 改这里：注册成功不直接登录，提示去登录
   const handleRegister = (name, email, password) => {
     const users = JSON.parse(localStorage.getItem('mentorMY_users') || '[]');
     if (users.some(u => u.email === email)) {
       alert("❌ This email is already registered!");
       return;
     }
-    // 保存用户
     saveUserToDB(name, email, password);
-    
-    // 清空表单 + 弹出登录框，不直接进入主页
     setLandingRegisterForm({ name: '', email: '', password: '' });
     setRegisterForm({ name: '', email: '', password: '' });
     alert("✅ Register successful! Please login now.");
@@ -285,9 +293,13 @@ function App() {
     setSelectedPathway(null);
   };
 
+  // ========== 新的 handleSaveEdit（更新所有字段） ==========
   const handleSaveEdit = () => {
     user.setName(editForm.name);
     user.setEmail(editForm.email);
+    user.setPhone(editForm.phone);
+    user.setSchool(editForm.school);
+    user.setBio(editForm.bio);
     setUser({ ...user });
     setShowEditModal(false);
   };
@@ -358,7 +370,7 @@ function App() {
         </div>
       </nav>
 
-      {/* 未登录：只显示注册页，已删掉 Skip & Browse */}
+      {/* 未登录：只显示注册页 */}
       {!user && (
         <section style={{
           minHeight: '80vh',
@@ -551,7 +563,7 @@ function App() {
                   </div>
                   <div className="card-actions">
                     <button className="btn-save" onClick={() => toggleSaveMentor(m)}>
-                      Unsave
+                      {isMentorSaved(m.id) ? 'Unsave' : 'Save'}
                     </button>
                     <button className="btn-book" onClick={() => { setSelectedMentor(m); setShowBookModal(true); }}>
                       Book Now
@@ -619,10 +631,19 @@ function App() {
           <div className="dashboard-grid">
             <div className="dashboard-card">
               <h3>My Profile</h3>
-              <p>Name: {user.getName()}</p>
-              <p>Email: {user.getEmail()}</p>
+              <p><strong>Name:</strong> {user.getName()}</p>
+              <p><strong>Email:</strong> {user.getEmail()}</p>
+              <p><strong>Phone:</strong> {user.getPhone() || 'Not set'}</p>
+              <p><strong>School/University:</strong> {user.getSchool() || 'Not set'}</p>
+              <p><strong>About Me:</strong> {user.getBio() || 'Not set'}</p>
               <button className="dashboard-btn" onClick={() => {
-                setEditForm({ name: user.getName(), email: user.getEmail() });
+                setEditForm({ 
+                  name: user.getName(), 
+                  email: user.getEmail(), 
+                  phone: user.getPhone(), 
+                  school: user.getSchool(), 
+                  bio: user.getBio() 
+                });
                 setShowEditModal(true);
               }}>
                 Edit Profile
@@ -871,6 +892,7 @@ function App() {
         </div>
       )}
 
+      {/* 新版 Edit Profile Modal，包含所有字段 */}
       {showEditModal && (
         <div className="modal-overlay">
           <div className="modal">
@@ -886,6 +908,24 @@ function App() {
               placeholder="Your Email"
               value={editForm.email}
               onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+            />
+            <input
+              type="tel"
+              placeholder="Phone Number (Optional)"
+              value={editForm.phone}
+              onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+            />
+            <input
+              type="text"
+              placeholder="School/University (Optional)"
+              value={editForm.school}
+              onChange={(e) => setEditForm({ ...editForm, school: e.target.value })}
+            />
+            <textarea
+              placeholder="About Me / Study Goals (Optional)"
+              value={editForm.bio}
+              onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+              style={{ minHeight: '80px', width: '100%', padding: '0.9rem', borderRadius: '8px', border: '1px solid #ddd' }}
             />
             <button className="modal-btn" onClick={handleSaveEdit}>Save Changes</button>
             <button className="modal-close" onClick={() => setShowEditModal(false)}>Close</button>
