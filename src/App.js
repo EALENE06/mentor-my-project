@@ -1,11 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 // ========== Inheritance & Polymorphism (Teacher Requirement) ==========
-// Parent Class 父类
-// ========== OOP Concepts: Encapsulation, Inheritance & Polymorphism ==========
-
-// Parent Class
 class User {
   #name;
   #email;
@@ -36,14 +32,14 @@ class User {
   }
 }
 
-// Inheritance: Student inherits from User
+// Inheritance: Student
 class Student extends User {
   getRoleInfo() {
     return "Student: Can search, save and book mentors";
   }
 }
 
-// Inheritance: Mentor inherits from User
+// Inheritance: Mentor
 class Mentor extends User {
   getRoleInfo() {
     return "Mentor: Provides Sarawak career and study guidance";
@@ -54,12 +50,19 @@ class Mentor extends User {
 const user1 = new Student("Student Aisha", "student@mail.com");
 const user2 = new Mentor("Mentor Daniel", "mentor@mail.com");
 
-console.log(user1.getName(), "-", user1.getRoleInfo());
-console.log(user2.getName(), "-", user2.getRoleInfo());
-// =====================================================================
+// ========== LocalStorage User Authentication ==========
+const saveUserToDB = (name, email, password) => {
+  const users = JSON.parse(localStorage.getItem('mentorMY_users') || '[]');
+  users.push({ name, email, password });
+  localStorage.setItem('mentorMY_users', JSON.stringify(users));
+};
+
+const validateLogin = (email, password) => {
+  const users = JSON.parse(localStorage.getItem('mentorMY_users') || '[]');
+  return users.find(u => u.email === email && u.password === password);
+};
 
 function App() {
-  // 页面状态：默认打开直接进入注册落地页
   const [currentPage, setCurrentPage] = useState('landing');
   const [user, setUser] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
@@ -73,14 +76,18 @@ function App() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', email: '' });
 
-  // 登录/注册表单状态
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
   const [registerForm, setRegisterForm] = useState({ name: '', email: '', password: '' });
   const [landingRegisterForm, setLandingRegisterForm] = useState({ name: '', email: '', password: '' });
   const [bookingForm, setBookingForm] = useState({ date: '', topic: '' });
 
-  // 收藏导师列表
   const [savedMentors, setSavedMentors] = useState([]);
+
+  // OOP log only once
+  useEffect(() => {
+    console.log(user1.getName(), "-", user1.getRoleInfo());
+    console.log(user2.getName(), "-", user2.getRoleInfo());
+  }, []);
 
   const allMentors = [
     {
@@ -151,7 +158,6 @@ function App() {
     }
   ];
 
-  // 4大职业路线（含Medical）
   const pathways = [
     {
       id: 1,
@@ -220,8 +226,14 @@ function App() {
     m.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // ========== Auth Functions ==========
   const handleLogin = (email, password) => {
-    const newUser = new Student(email.split('@')[0], email);
+    const foundUser = validateLogin(email, password);
+    if (!foundUser) {
+      alert("❌ Email or password incorrect! Please register first.");
+      return;
+    }
+    const newUser = new Student(foundUser.name, foundUser.email);
     setUser(newUser);
     setShowLogin(false);
     setLoginForm({ email: '', password: '' });
@@ -229,6 +241,12 @@ function App() {
   };
 
   const handleRegister = (name, email, password) => {
+    const users = JSON.parse(localStorage.getItem('mentorMY_users') || '[]');
+    if (users.some(u => u.email === email)) {
+      alert("❌ This email is already registered!");
+      return;
+    }
+    saveUserToDB(name, email, password);
     const newUser = new Student(name, email);
     setUser(newUser);
     setShowRegister(false);
@@ -251,7 +269,6 @@ function App() {
     setBookings([...bookings, newBooking]);
     setShowBookModal(false);
     setBookingForm({ date: '', topic: '' });
-    
     alert("✅ Booking successful!");
   };
 
@@ -272,7 +289,6 @@ function App() {
     setShowEditModal(false);
   };
 
-  // 收藏/取消收藏导师
   const toggleSaveMentor = (mentor) => {
     const isSaved = savedMentors.some(m => m.id === mentor.id);
     if (isSaved) {
@@ -291,10 +307,38 @@ function App() {
       <nav className="navbar">
         <div className="logo">Mentor MY</div>
         <ul className="nav-links">
-          <li><button className="nav-btn" onClick={() => setCurrentPage('home')}>Home</button></li>
-          <li><button className="nav-btn" onClick={() => setCurrentPage('mentors')}>Mentors</button></li>
-          <li><button className="nav-btn" onClick={() => setCurrentPage('careers')}>Career Pathways</button></li>
-          <li><button className="nav-btn" onClick={() => setCurrentPage('about')}>About</button></li>
+          <li>
+            <button 
+              className="nav-btn" 
+              onClick={() => user ? setCurrentPage('home') : alert("⚠️ Please register or login first!")}
+            >
+              Home
+            </button>
+          </li>
+          <li>
+            <button 
+              className="nav-btn" 
+              onClick={() => user ? setCurrentPage('mentors') : alert("⚠️ Please register or login first!")}
+            >
+              Mentors
+            </button>
+          </li>
+          <li>
+            <button 
+              className="nav-btn" 
+              onClick={() => user ? setCurrentPage('careers') : alert("⚠️ Please register or login first!")}
+            >
+              Career Pathways
+            </button>
+          </li>
+          <li>
+            <button 
+              className="nav-btn" 
+              onClick={() => user ? setCurrentPage('about') : alert("⚠️ Please register or login first!")}
+            >
+              About
+            </button>
+          </li>
         </ul>
         <div className="auth-buttons">
           {user ? (
@@ -311,8 +355,8 @@ function App() {
         </div>
       </nav>
 
-      {/* 独立注册落地页（网站打开默认首页） */}
-      {currentPage === 'landing' && !user && (
+      {/* 未登录：只显示注册页，已删掉 Skip & Browse */}
+      {!user && (
         <section style={{
           minHeight: '80vh',
           display: 'flex',
@@ -375,25 +419,18 @@ function App() {
                 Login here
               </button>
             </p>
-
-            <button 
-              onClick={() => setCurrentPage('home')}
-              style={{marginTop:'1rem', background:'none', border:'none', color:'#666', cursor:'pointer'}}
-            >
-              Skip & Browse First
-            </button>
           </div>
         </section>
       )}
 
-      {currentPage === 'home' && (
+      {/* 已登录才可以看所有页面 */}
+      {user && currentPage === 'home' && (
         <>
           <section className="hero">
             <h1>Welcome to Mentor MY</h1>
             <p>Connect with experienced mentors, get academic guidance, and build your future career pathway — all in one platform.</p>
             <button className="btn-hero" onClick={() => setCurrentPage('mentors')}>Browse Mentors</button>
 
-            {/* 移到 Welcome 下面的 Sarawak 模块 */}
             <section style={{
               maxWidth: '1000px',
               margin: '3rem auto 0 auto',
@@ -406,12 +443,10 @@ function App() {
               <h2 style={{ marginBottom: '1rem', color: '#1f2937' }}>
                 🌏 Why Build Your Career in Sarawak?
               </h2>
-
               <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
                 Sarawak is rapidly growing with opportunities in technology, engineering, healthcare and local industries. 
                 Instead of leaving, students can build meaningful careers locally with strong community impact.
               </p>
-
               <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
                 <div>💻 Growing Digital Economy (PCDS)</div>
                 <div>🏭 Expanding Oil & Gas Sector</div>
@@ -468,7 +503,7 @@ function App() {
         </>
       )}
 
-      {currentPage === 'mentors' && (
+      {user && currentPage === 'mentors' && (
         <section className="mentors-section">
           <h2>All Mentors</h2>
           <p>Find the best mentor for your study & career</p>
@@ -528,7 +563,7 @@ function App() {
         </section>
       )}
 
-      {currentPage === 'careers' && (
+      {user && currentPage === 'careers' && (
         <section className="careers-section">
           <div className="careers-header">
             <h2>Career Pathways</h2>
@@ -544,7 +579,7 @@ function App() {
                 <h3>{p.title}</h3>
                 <div style={{ fontSize: '0.85rem', color: '#4f46e5', marginBottom: '1rem', fontWeight: '600' }}> 
                   {p.demand} 
-                  </div>
+                </div>
                 <div className="path-steps">
                   {p.steps.slice(0, 2).map((s, i) => (
                     <div className="step" key={i}>
@@ -569,7 +604,7 @@ function App() {
         </section>
       )}
 
-      {currentPage === 'dashboard' && user && (
+      {user && currentPage === 'dashboard' && (
         <section className="dashboard-section">
           <div className="dashboard-header">
             <h2>My Dashboard</h2>
@@ -579,7 +614,6 @@ function App() {
           </div>
 
           <div className="dashboard-grid">
-            {/* Profile */}
             <div className="dashboard-card">
               <h3>My Profile</h3>
               <p>Name: {user.getName()}</p>
@@ -592,7 +626,6 @@ function App() {
               </button>
             </div>
 
-            {/* Bookings */}
             <div className="dashboard-card">
               <h3>My Bookings</h3>
               {bookings.length === 0 ? (
@@ -616,10 +649,8 @@ function App() {
             </div>
           </div>
 
-          {/* Saved Mentors */}
           <div className="dashboard-section" style={{ marginTop: '2rem' }}>
             <h3 style={{ marginBottom: '1.5rem', fontSize: '1.4rem' }}>Saved Mentors</h3>
-
             {savedMentors.length === 0 ? (
               <p style={{ color: '#6b7280', textAlign: 'center', padding: '1rem' }}>
                 You haven’t saved any mentors yet.
@@ -657,7 +688,7 @@ function App() {
         </section>
       )}
 
-      {currentPage === 'about' && (
+      {user && currentPage === 'about' && (
         <section className="about-section" style={{padding: '3rem 1rem', maxWidth: '1000px', margin: '0 auto'}}>
           <h2 style={{fontSize: '2.2rem', marginBottom: '1rem'}}>About Mentor MY</h2>
           <p style={{maxWidth: '800px', margin: '0 auto 1rem auto', fontSize: '1.1rem', lineHeight: '1.8'}}>
@@ -696,7 +727,6 @@ function App() {
             Back to Home
           </button>
 
-          {/* About页面内Contact（地址已改为Sibu） */}
           <div className="contact-section" style={{marginTop: '4rem', padding: '2rem', borderRadius: '16px', backgroundColor: 'rgba(255,255,255,0.75)'}}>
             <h2>Contact Us</h2>
             <p style={{margin: '0.5rem 0'}}>📧 Email: support@mentormy.com</p>
@@ -705,14 +735,13 @@ function App() {
         </section>
       )}
 
-      {/* 全局底部Footer Contact（地址也改为Sibu，两处完全统一） */}
       <section className="contact-section">
         <h2>Contact Us</h2>
         <p>Email: support@mentormy.com</p>
         <p>Location: Sibu, Sarawak, Malaysia</p>
       </section>
 
-      {/* 所有弹窗组件 */}
+      {/* All Modals */}
       {showLogin && (
         <div className="modal-overlay">
           <div className="modal">
