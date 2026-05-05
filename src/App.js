@@ -240,18 +240,21 @@ function App() {
     setCurrentPage('home');
   };
 
+  // 改这里：注册成功不直接登录，提示去登录
   const handleRegister = (name, email, password) => {
     const users = JSON.parse(localStorage.getItem('mentorMY_users') || '[]');
     if (users.some(u => u.email === email)) {
       alert("❌ This email is already registered!");
       return;
     }
+    // 保存用户
     saveUserToDB(name, email, password);
-    const newUser = new Student(name, email);
-    setUser(newUser);
-    setShowRegister(false);
+    
+    // 清空表单 + 弹出登录框，不直接进入主页
+    setLandingRegisterForm({ name: '', email: '', password: '' });
     setRegisterForm({ name: '', email: '', password: '' });
-    setCurrentPage('home');
+    alert("✅ Register successful! Please login now.");
+    setShowLogin(true);
   };
 
   const handleBook = (mentor, date, topic) => {
@@ -548,7 +551,7 @@ function App() {
                   </div>
                   <div className="card-actions">
                     <button className="btn-save" onClick={() => toggleSaveMentor(m)}>
-                      {isMentorSaved(m.id) ? 'Unsave' : 'Save'}
+                      Unsave
                     </button>
                     <button className="btn-book" onClick={() => { setSelectedMentor(m); setShowBookModal(true); }}>
                       Book Now
