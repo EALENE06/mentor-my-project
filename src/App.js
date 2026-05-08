@@ -104,7 +104,7 @@ const getSavedFromDB = () => {
   return JSON.parse(localStorage.getItem('mentorMY_saved') || '[]');
 };
 
-// 预设导师账号（首次自动可用）
+// 预设导师账号（强制分支，Netlify 也能直接登录）
 const MENTOR_DEFAULT_ACC = {
   email: 'aisha@mentor.my',
   password: 'mentor123',
@@ -185,9 +185,9 @@ function App() {
     m.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // ========== 登录注册逻辑 ==========
+  // ========== 登录注册逻辑（已修复：导师账号独立分支） ==========
   const handleLogin = (email, password) => {
-    // 预设导师账号
+    // ✅ 强制预设导师账号逻辑，不依赖 localStorage
     if (email === MENTOR_DEFAULT_ACC.email && password === MENTOR_DEFAULT_ACC.password) {
       const mentorUser = new User(MENTOR_DEFAULT_ACC.name, email, '', '', '', 'mentor');
       setCurrentUser(mentorUser);
@@ -199,7 +199,7 @@ function App() {
 
     const res = loginCheck(email, password);
     if (!res) {
-      alert('Email or password incorrect');
+      alert('Email or password incorrect! Please register first.');
       return;
     }
     const user = new User(res.name, res.email, '', '', '', res.role);
