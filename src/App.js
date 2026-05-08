@@ -3,22 +3,18 @@ import './App.css';
 
 // ========== OOP 角色类 ==========
 class User {
-  constructor(name, email, phone = '', school = '', bio = '', role = 'student') {
+  constructor(name, email, role = 'student', phone = '', school = '', bio = '') {
     this.name = name;
     this.email = email;
+    this.role = role;
     this.phone = phone;
     this.school = school;
     this.bio = bio;
-    this.role = role;
-  }
-
-  getRoleInfo() {
-    return this.role === 'mentor' ? "Mentor: Manage own booking requests" : "Student: Find & book mentors";
   }
 }
 
 // ========== LocalStorage 工具函数 ==========
-const saveUserToDB = (name, email, password, role = 'student') => {
+const saveUserToDB = (name, email, password, role) => {
   const users = JSON.parse(localStorage.getItem('mentorMY_users') || '[]');
   users.push({ name, email, password, role });
   localStorage.setItem('mentorMY_users', JSON.stringify(users));
@@ -31,113 +27,84 @@ const loginCheck = (email, password) => {
 
 const getMentorsFromDB = () => {
   const defaultMentors = [
-    { id: 1, name: 'Aisha Tan', email: 'aisha@mentor.my', major: 'Computer Science', lang: 'English, Malay', rating: 4.9, location: 'Kuching', industry: 'Tech', company: 'Sarawak Digital Economy', desc: 'Guidance on web dev and tech career in Sarawak.' },
-    { id: 2, name: 'Daniel Lee', email: 'daniel@mentor.my", major: 'Data Science', lang: 'English, Malay', rating: 4.8, location: 'Miri', industry: 'Data / Oil & Gas', company: 'Local Energy Firm', desc: 'Python, data analysis and industry career advice.' },
-    { id: 3, name: 'Priya Nair', email: 'priya@mentor.my', major: 'Business', lang: 'English, Malay, Tamil', rating: 4.7, location: 'Sibu', industry: 'Business / SME', company: 'Local Business Consultant', desc: 'Business study and startup guidance.' }
+    { id: 1, name: 'Aisha Tan', email: 'aisha@mentor.my', major: 'Computer Science', lang: 'English, Malay', rating: 4.9, location: 'Kuching', desc: 'Guidance on web dev and tech career.' },
+    { id: 2, name: 'Daniel Lee', email: 'daniel@mentor.my', major: 'Data Science', lang: 'English, Malay', rating: 4.8, location: 'Miri', desc: 'Python and data analysis advice.' },
+    { id: 3, name: 'Priya Nair', email: 'priya@mentor.my', major: 'Business', lang: 'English, Malay', rating: 4.7, location: 'Sibu', desc: 'Startup and SME guidance.' }
   ];
   return JSON.parse(localStorage.getItem('mentorMY_mentors') || JSON.stringify(defaultMentors));
 };
 
-const saveBookingsToDB = (list) => {
-  localStorage.setItem('mentorMY_bookings', JSON.stringify(list));
-};
+const getStoredData = (key) => JSON.parse(localStorage.getItem(key) || '[]');
+const setStoredData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
 
-const getBookingsFromDB = () => {
-  return JSON.parse(localStorage.getItem('mentorMY_bookings') || '[]');
-};
-
-const saveSavedToDB = (list) => {
-  localStorage.setItem('mentorMY_saved', JSON.stringify(list));
-};
-
-const getSavedFromDB = () => {
-  return JSON.parse(localStorage.getItem('mentorMY_saved') || '[]');
-};
-
-// 预设导师账号（独立分支，Netlify 直接生效）
-const MENTOR_DEFAULT_ACC = {
-  email: 'aisha@mentor.my',
-  password: 'mentor123',
-  name: 'Aisha Tan',
-  role: 'mentor'
-};
-
+// ========== 主程序 ==========
 function App() {
+  // 页面转换状态
   const [currentPage, setCurrentPage] = useState('landing');
   const [currentUser, setCurrentUser] = useState(null);
+  
+  // 弹窗状态
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showBookModal, setShowBookModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [selectedPathway, setSelectedPathway] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(false);
 
-  const [allMentors, setAllMentors] = useState(getMentorsFromDB());
-  const [bookingList, setBookingList] = useState(getBookingsFromDB());
-  const [savedMentors, setSavedMentors] = useState(getSavedFromDB());
-
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
-  const [regForm, setRegForm] = useState({ name: '', email: '', password: '' });
-  const [landingRegForm, setLandingRegForm] = useState({ name: '', email: '', password: '' });
-  const [editForm, setEditForm] = useState({ name: '', email: '', phone: '', school: '', bio: '' });
-  const [bookForm, setBookForm] = useState({ date: '', topic: '' });
+  // 数据状态
+  const [allMentors] = useState(getMentorsFromDB());
+  const [bookingList, setBookingList] = useState(getStoredData('mentorMY_bookings'));
+  const [savedMentors, setSavedMentors] = useState(getStoredData('mentorMY_saved'));
   const [searchTerm, setSearchTerm] = useState('');
 
+  // 表单状态
+  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
+  const [regForm, setRegForm] = useState({ name: '', email: '', password: '', role: 'student' });
+  const [editForm, setEditForm] = useState({ name: '', phone: '', school: '', bio: '' });
+  const [bookForm, setBookForm] = useState({ date: '', topic: '' });
+
   const pathways = [
-    { id: 1, title: 'Computer Science', icon: '💻', desc: 'Build software, web app, AI systems.', demand: 'High demand in Sarawak Digital Economy', skills: ['Python', 'JS', 'SQL', 'UI/UX'] },
-    { id: 2, title: 'Business & Accounting', icon: '📊', desc: 'Corporate, banking, startup path.', demand: 'Stable demand for local SMEs', skills: ['Marketing', 'Finance', 'Management'] },
-    { id: 3, title: 'Engineering', icon: '🔧', desc: 'Oil & gas, civil, electrical field.', demand: 'Strong demand in Sarawak industry', skills: ['Math', 'Design', 'Site Operation'] },
-    { id: 4, title: 'Medical & Health', icon: '🩺', desc: 'Nurse, doctor, pharmacy career.', demand: 'Permanent public sector need', skills: ['Biology', 'Chemistry', 'Carework'] }
+    { id: 1, title: 'Computer Science', icon: '💻', desc: 'Build software & AI systems.', demand: 'High demand in Sarawak', skills: ['Python', 'JS', 'SQL'] },
+    { id: 2, title: 'Business', icon: '📊', desc: 'Corporate & startup path.', demand: 'Stable for local SMEs', skills: ['Marketing', 'Finance'] }
   ];
 
-  useEffect(() => { saveBookingsToDB(bookingList); }, [bookingList]);
-  useEffect(() => { saveSavedToDB(savedMentors); }, [savedMentors]);
+  // 持久化存储
+  useEffect(() => { setStoredData('mentorMY_bookings', bookingList); }, [bookingList]);
+  useEffect(() => { setStoredData('mentorMY_saved', savedMentors); }, [savedMentors]);
 
-  const filteredMentors = allMentors.filter(m =>
-    m.major.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    m.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // 登录逻辑（已修复）
+  // 登录逻辑
   const handleLogin = (email, password) => {
-    if (email === MENTOR_DEFAULT_ACC.email && password === MENTOR_DEFAULT_ACC.password) {
-      const mentorUser = new User(MENTOR_DEFAULT_ACC.name, email, '', '', '', 'mentor');
-      setCurrentUser(mentorUser);
+    // 预设导师快捷登录
+    if (email === 'aisha@mentor.my' && password === 'mentor123') {
+      const u = new User('Aisha Tan', email, 'mentor');
+      setCurrentUser(u);
       setShowLogin(false);
       setCurrentPage('mentorPanel');
-      setLoginForm({ email: '', password: '' });
       return;
     }
+
     const res = loginCheck(email, password);
-    if (!res) {
-      alert('Email or password incorrect! Please register first.');
-      return;
+    if (res) {
+      const u = new User(res.name, res.email, res.role);
+      setCurrentUser(u);
+      setShowLogin(false);
+      setCurrentPage(res.role === 'mentor' ? 'mentorPanel' : 'home');
+    } else {
+      alert('Login failed. Please check your credentials.');
     }
-    const user = new User(res.name, res.email, '', '', '', res.role);
-    setCurrentUser(user);
-    setShowLogin(false);
-    setLoginForm({ email: '', password: '' });
-    setCurrentPage('home');
   };
 
-  const handleRegister = (name, email, password) => {
-    const users = JSON.parse(localStorage.getItem('mentorMY_users') || '[]');
-    if (users.some(u => u.email === email)) {
-      alert('Email already registered');
-      return;
-    }
-    saveUserToDB(name, email, password, 'student');
-    alert('Register success! Please login');
-    setLandingRegForm({ name: '', email: '', password: '' });
-    setRegForm({ name: '', email: '', password: '' });
+  // 注册逻辑
+  const handleRegister = () => {
+    if (!regForm.name || !regForm.email || !regForm.password) return alert('Fill all fields');
+    saveUserToDB(regForm.name, regForm.email, regForm.password, regForm.role);
+    alert('Register success! Now please login.');
+    setShowRegister(false);
     setShowLogin(true);
   };
 
+  // 预约逻辑
   const submitBooking = () => {
-    if (!bookForm.date || !bookForm.topic) {
-      alert('Please fill date and topic');
-      return;
-    }
     const newBooking = {
       id: Date.now(),
       studentName: currentUser.name,
@@ -150,339 +117,184 @@ function App() {
     };
     setBookingList([...bookingList, newBooking]);
     setShowBookModal(false);
-    setBookForm({ date: '', topic: '' });
-    alert('Booking sent, waiting mentor approval');
+    alert('Request sent to mentor!');
   };
 
-  const handleApprove = (bookingId) => {
-    const updated = bookingList.map(item =>
-      item.id === bookingId ? { ...item, status: 'Approved' } : item
-    );
+  // 审批逻辑 (导师端)
+  const updateBookingStatus = (id, newStatus) => {
+    const updated = bookingList.map(b => b.id === id ? { ...b, status: newStatus } : b);
     setBookingList(updated);
   };
 
-  const handleDeny = (bookingId) => {
-    const updated = bookingList.map(item =>
-      item.id === bookingId ? { ...item, status: 'Denied' } : item
-    );
-    setBookingList(updated);
-  };
-
-  const getMyBookingRequests = () => {
-    if (!currentUser || currentUser.role !== 'mentor') return [];
-    return bookingList.filter(b => b.mentorEmail === currentUser.email);
-  };
-
-  const getMyStudentBookings = () => {
-    if (!currentUser || currentUser.role !== 'student') return [];
-    return bookingList.filter(b => b.studentEmail === currentUser.email);
-  };
-
-  const toggleSaveMentor = (mentor) => {
-    const exist = savedMentors.some(item => item.id === mentor.id);
-    if (exist) {
-      setSavedMentors(savedMentors.filter(item => item.id !== mentor.id));
-    } else {
-      setSavedMentors([...savedMentors, mentor]);
-    }
-  };
-
-  const saveProfileEdit = () => {
-    const updatedUser = new User(
-      editForm.name,
-      currentUser.email,
-      editForm.phone,
-      editForm.school,
-      editForm.bio,
-      currentUser.role
-    );
-    setCurrentUser(updatedUser);
-    setShowEditModal(false);
-  };
-
-  const logout = () => {
-    setCurrentUser(null);
-    setCurrentPage('landing');
-  };
+  // 数据过滤
+  const mentorPendingCount = bookingList.filter(b => b.mentorEmail === currentUser?.email && b.status === 'Pending').length;
+  const myRequests = bookingList.filter(b => b.studentEmail === currentUser?.email);
+  const mentorRequests = bookingList.filter(b => b.mentorEmail === currentUser?.email);
 
   return (
-    <div className="App">
-      <nav className="navbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem 3rem',background:'#fff',boxShadow:'0 2px 8px #00000015'}}>
-        <div className="logo" style={{fontWeight:'bold',fontSize:'1.3rem'}}>Mentor MY</div>
-        <ul style={{display:'flex',gap:'1.5rem',listStyle:'none',margin:0,padding:0}}>
+    <div className="App" style={{ background: '#f4f7fe', minHeight: '100vh', fontFamily: 'Inter, sans-serif' }}>
+      {/* 导航栏 */}
+      <nav style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem 5%', background: '#fff', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', position: 'sticky', top: 0, zIndex: 100 }}>
+        <div style={{ fontWeight: '800', fontSize: '1.5rem', color: '#2563eb', cursor: 'pointer' }} onClick={() => setCurrentPage('landing')}>Mentor MY</div>
+        <ul style={{ display: 'flex', gap: '20px', listStyle: 'none', alignItems: 'center' }}>
           {currentUser ? (
             <>
-              <li><button onClick={()=>setCurrentPage('home')} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}>Home</button></li>
-              <li><button onClick={()=>setCurrentPage('mentors')} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}>Mentors</button></li>
-              <li><button onClick={()=>setCurrentPage('pathways')} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}>Career Path</button></li>
-              <li><button onClick={()=>setCurrentPage('dashboard')} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}>Dashboard</button></li>
+              <li onClick={() => setCurrentPage('home')} style={{ cursor: 'pointer' }}>Home</li>
+              <li onClick={() => setCurrentPage('mentors')} style={{ cursor: 'pointer' }}>Find Mentors</li>
+              <li onClick={() => setCurrentPage('dashboard')} style={{ cursor: 'pointer' }}>Dashboard</li>
               {currentUser.role === 'mentor' && (
-                <li><button onClick={()=>setCurrentPage('mentorPanel')} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem',color:'#2563eb'}}>Mentor Panel</button></li>
+                <li onClick={() => setCurrentPage('mentorPanel')} style={{ cursor: 'pointer', color: '#2563eb', fontWeight: 'bold' }}>
+                  Manage Requests {mentorPendingCount > 0 && <span style={{ background: 'red', color: 'white', borderRadius: '50%', padding: '2px 7px', fontSize: '12px' }}>{mentorPendingCount}</span>}
+                </li>
               )}
-              <li><button onClick={logout} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem',color:'#dc2626'}}>Logout</button></li>
+              <li onClick={() => { setCurrentUser(null); setCurrentPage('landing'); }} style={{ color: 'red', cursor: 'pointer' }}>Logout</li>
             </>
           ) : (
             <>
-              <li><button onClick={()=>setShowLogin(true)} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}>Login</button></li>
-              <li><button onClick={()=>setShowRegister(true)} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}>Register</button></li>
+              <button onClick={() => setShowLogin(true)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>Login</button>
+              <button onClick={() => setShowRegister(true)} style={{ background: '#2563eb', color: '#fff', padding: '8px 20px', borderRadius: '8px', border: 'none', cursor: 'pointer' }}>Join Free</button>
             </>
           )}
         </ul>
       </nav>
 
+      {/* 落地页 (未登录) */}
       {!currentUser && currentPage === 'landing' && (
-        <section style={{minHeight:'80vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
-          <div style={{background:'rgba(255,255,255,0.92)',padding:'2.5rem',borderRadius:'16px',boxShadow:'0 8px 32px #00000015',maxWidth:'450px',width:'100%',textAlign:'center'}}>
-            <h1 style={{marginBottom:'0.5rem'}}>Join Mentor MY 🎓</h1>
-            <p style={{color:'#666',marginBottom:'1.5rem'}}>Find your Sarawak career mentor</p>
-            <input
-              placeholder="Full Name"
-              value={landingRegForm.name}
-              onChange={e=>setLandingRegForm({...landingRegForm,name:e.target.value})}
-              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
-            />
-            <input
-              placeholder="Email"
-              type="email"
-              value={landingRegForm.email}
-              onChange={e=>setLandingRegForm({...landingRegForm,email:e.target.value})}
-              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
-            />
-            <input
-              placeholder="Password"
-              type="password"
-              value={landingRegForm.password}
-              onChange={e=>setLandingRegForm({...landingRegForm,password:e.target.value})}
-              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
-            />
-            <button
-              onClick={()=>handleRegister(landingRegForm.name,landingRegForm.email,landingRegForm.password)}
-              style={{width:'100%',padding:'0.9rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',marginTop:'0.8rem',cursor:'pointer'}}
-            >
-              Register Now
-            </button>
-            <p style={{marginTop:'1.2rem'}}>
-              Already have account?
-              <button onClick={()=>setShowLogin(true)} style={{color:'#2563eb',border:'none',background:'none',cursor:'pointer',marginLeft:'0.3rem'}}>Login</button>
-            </p>
-          </div>
-        </section>
+        <header style={{ textAlign: 'center', padding: '100px 20px' }}>
+          <h1 style={{ fontSize: '3.5rem', marginBottom: '20px' }}>Unlock Your Potential with <br/><span style={{color:'#2563eb'}}>Sarawak Mentors</span></h1>
+          <p style={{ fontSize: '1.2rem', color: '#666', marginBottom: '30px' }}>Connect with industry leaders in Kuching, Miri, and Sibu.</p>
+          <button onClick={() => setShowRegister(true)} style={{ padding: '15px 40px', fontSize: '1.1rem', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '12px', cursor: 'pointer' }}>Get Started Now</button>
+        </header>
       )}
 
+      {/* 导师面板 (导师专用) */}
       {currentUser?.role === 'mentor' && currentPage === 'mentorPanel' && (
-        <section style={{padding:'3rem',maxWidth:'1100px',margin:'0 auto'}}>
-          <h2 style={{marginBottom:'2rem'}}>👋 Mentor Booking Approval Panel</h2>
-          {getMyBookingRequests().length === 0 ? (
-            <p style={{fontSize:'1.1rem',color:'#666'}}>No pending booking requests yet.</p>
-          ) : (
-            <div style={{display:'grid',gap:'1.5rem'}}>
-              {getMyBookingRequests().map(item=>(
-                <div key={item.id} style={{padding:'1.5rem',background:'#f8f9fa',borderRadius:'12px',border:'1px solid #eee'}}>
-                  <h3 style={{margin:'0 0 0.5rem'}}>From: {item.studentName}</h3>
-                  <p style={{margin:'0.3rem 0'}}>Date: {item.date}</p>
-                  <p style={{margin:'0.3rem 0'}}>Topic: {item.topic}</p>
-                  <p style={{margin:'0.3rem 0',fontWeight:'bold'}}>
-                    Status: 
-                    <span style={{color:item.status==='Approved'?'#16a34a':item.status==='Denied'?'#dc2626':'#ca8a04'}}>
-                      &nbsp;{item.status}
-                    </span>
-                  </p>
-                  {item.status === 'Pending' && (
-                    <div style={{marginTop:'1rem',display:'flex',gap:'1rem'}}>
-                      <button onClick={()=>handleApprove(item.id)} style={{padding:'0.6rem 1.2rem',background:'#16a34a',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}>Approve</button>
-                      <button onClick={()=>handleDeny(item.id)} style={{padding:'0.6rem 1.2rem',background:'#dc2626',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}>Deny</button>
-                    </div>
-                  )}
+        <div style={{ padding: '40px 5%' }}>
+          <h2>Incoming Booking Requests</h2>
+          <div style={{ display: 'grid', gap: '20px', marginTop: '20px' }}>
+            {mentorRequests.length === 0 && <p>No requests yet.</p>}
+            {mentorRequests.map(b => (
+              <div key={b.id} style={{ background: '#fff', padding: '20px', borderRadius: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+                <div>
+                  <h4 style={{ margin: 0 }}>From: {b.studentName}</h4>
+                  <p style={{ margin: '5px 0', color: '#666' }}>Topic: {b.topic} | Date: {b.date}</p>
+                  <span style={{ fontWeight: 'bold', color: b.status === 'Approved' ? 'green' : b.status === 'Denied' ? 'red' : 'orange' }}>{b.status}</span>
                 </div>
-              ))}
-            </div>
-          )}
-        </section>
+                {b.status === 'Pending' && (
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button onClick={() => updateBookingStatus(b.id, 'Approved')} style={{ background: '#16a34a', color: '#fff', border: 'none', padding: '8px 15px', borderRadius: '6px' }}>Approve</button>
+                    <button onClick={() => updateBookingStatus(b.id, 'Denied')} style={{ background: '#dc2626', color: '#fff', border: 'none', padding: '8px 15px', borderRadius: '6px' }}>Deny</button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
-      {currentUser && currentPage === 'home' && (
-        <section style={{padding:'3rem',textAlign:'center'}}>
-          <h1>Welcome back, {currentUser.name} 🎓</h1>
-          <p style={{fontSize:'1.1rem',color:'#666',maxWidth:'700px',margin:'1rem auto'}}>
-            Explore professional mentors, book consultation, plan your Sarawak career path.
-          </p>
-          <button onClick={()=>setCurrentPage('mentors')} style={{padding:'1rem 2rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',marginTop:'1.5rem',cursor:'pointer'}}>
-            Browse All Mentors
-          </button>
-        </section>
-      )}
-
+      {/* 导师列表 (学生专用) */}
       {currentUser && currentPage === 'mentors' && (
-        <section style={{padding:'3rem',maxWidth:'1200px',margin:'0 auto'}}>
-          <h2 style={{marginBottom:'1.5rem'}}>All Mentors</h2>
-          <input
-            placeholder="Search mentor by name / field"
-            value={searchTerm}
-            onChange={e=>setSearchTerm(e.target.value)}
-            style={{width:'100%',maxWidth:'500px',padding:'0.9rem',borderRadius:'8px',border:'1px solid #ddd',marginBottom:'2rem'}}
-          />
-          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(280px, 1fr))',gap:'1.5rem'}}>
-            {filteredMentors.map(m=>(
-              <div key={m.id} style={{padding:'1.5rem',background:'#fff',borderRadius:'12px',boxShadow:'0 4px 12px #00000010'}}>
-                <div style={{display:'flex',alignItems:'center',gap:'1rem',marginBottom:'1rem'}}>
-                  <div style={{width:'45px',height:'45px',borderRadius:'50%',background:'#2563eb',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:'bold',fontSize:'1.2rem'}}>
-                    {m.name[0]}
-                  </div>
-                  <div>
-                    <h3 style={{margin:0}}>{m.name}</h3>
-                    <p style={{margin:'0',color:'#666'}}>⭐ {m.rating}</p>
-                  </div>
-                </div>
-                <p style={{margin:'0.4rem 0'}}><strong>Field:</strong> {m.major}</p>
-                <p style={{margin:'0.4rem 0'}}><strong>Location:</strong> {m.location}</p>
-                <p style={{margin:'0.4rem 0',fontSize:'0.9rem',color:'#555'}}>{m.desc}</p>
-                <div style={{display:'flex',gap:'0.8rem',marginTop:'1.2rem'}}>
-                  <button onClick={()=>toggleSaveMentor(m)} style={{flex:1,padding:'0.6rem',border:`1px solid ${savedMentors.some(x=>x.id===m.id)?'#2563eb':'#ddd'}`,background:savedMentors.some(x=>x.id===m.id)?'#eff6ff':'#fff',borderRadius:'6px',cursor:'pointer'}}>
-                    {savedMentors.some(x=>x.id===m.id) ? 'Saved' : 'Save'}
-                  </button>
-                  <button onClick={()=>{setSelectedMentor(m);setShowBookModal(true);}} style={{flex:1,padding:'0.6rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}>
-                    Book
-                  </button>
-                </div>
-              </div>
-            ))}
+        <div style={{ padding: '40px 5%' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+            <h2>Available Mentors</h2>
+            <input placeholder="Search major or name..." onChange={(e) => setSearchTerm(e.target.value)} style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ddd', width: '300px' }} />
           </div>
-        </section>
-      )}
-
-      {currentUser && currentPage === 'pathways' && (
-        <section style={{padding:'3rem',maxWidth:'1200px',margin:'0 auto'}}>
-          <h2 style={{marginBottom:'2rem'}}>Sarawak Career Pathways</h2>
-          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill, minmax(250px, 1fr))',gap:'1.5rem'}}>
-            {pathways.map(p=>(
-              <div key={p.id} style={{padding:'1.5rem',background:'#fff',borderRadius:'12px',boxShadow:'0 4px 12px #00000010'}}>
-                <div style={{fontSize:'2.5rem'}}>{p.icon}</div>
-                <h3>{p.title}</h3>
-                <p>{p.desc}</p>
-                <p style={{color:'#2563eb',fontWeight:'bold'}}>{p.demand}</p>
-                <button onClick={()=>setSelectedPathway(p)} style={{marginTop:'1rem',padding:'0.6rem 1rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}>View Details</button>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {currentUser && currentPage === 'dashboard' && (
-        <section style={{padding:'3rem',maxWidth:'1000px',margin:'0 auto'}}>
-          <h2>Dashboard</h2>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'2rem',marginTop:'2rem'}}>
-            <div style={{padding:'1.5rem',background:'#f8f9fa',borderRadius:'12px'}}>
-              <h3>My Profile</h3>
-              <p><strong>Name:</strong> {currentUser.name}</p>
-              <p><strong>Email:</strong> {currentUser.email}</p>
-              <p><strong>Role:</strong> {currentUser.role}</p>
-              <p><strong>Phone:</strong> {currentUser.phone || 'Not set'}</p>
-              <p><strong>School:</strong> {currentUser.school || 'Not set'}</p>
-              <p><strong>Bio:</strong> {currentUser.bio || 'Not set'}</p>
-              <button onClick={()=>{setEditForm({name:currentUser.name,email:currentUser.email,phone:currentUser.phone,school:currentUser.school,bio:currentUser.bio});setShowEditModal(true);}} style={{marginTop:'1rem',padding:'0.6rem 1rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}>Edit Profile</button>
-            </div>
-            <div style={{padding:'1.5rem',background:'#f8f9fa',borderRadius:'12px'}}>
-              <h3>My Bookings</h3>
-              {getMyStudentBookings().length === 0 ? (
-                <p>No booking yet.</p>
-              ) : (
-                <div style={{display:'grid',gap:'1rem'}}>
-                  {getMyStudentBookings().map(b=>(
-                    <div key={b.id} style={{padding:'1rem',background:'#fff',borderRadius:'8px'}}>
-                      <p style={{margin:'0'}}><strong>Mentor:</strong> {b.mentorName}</p>
-                      <p style={{margin:'0'}}><strong>Date:</strong> {b.date}</p>
-                      <p style={{margin:'0'}}>
-                        Status: 
-                        <span style={{color:b.status==='Approved'?'#16a34a':b.status==='Denied'?'#dc2626':'#ca8a04',fontWeight:'bold'}}>
-                          &nbsp;{b.status}
-                        </span>
-                      </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '25px' }}>
+            {allMentors.filter(m => m.name.toLowerCase().includes(searchTerm.toLowerCase()) || m.major.toLowerCase().includes(searchTerm.toLowerCase())).map(m => {
+              const isPending = bookingList.some(b => b.mentorEmail === m.email && b.studentEmail === currentUser.email && b.status === 'Pending');
+              return (
+                <div key={m.id} style={{ background: '#fff', padding: '25px', borderRadius: '20px', boxShadow: '0 10px 20px rgba(0,0,0,0.05)' }}>
+                  <div style={{ display: 'flex', gap: '15px', marginBottom: '15px' }}>
+                    <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: '#2563eb', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>{m.name[0]}</div>
+                    <div>
+                      <h3 style={{ margin: 0 }}>{m.name}</h3>
+                      <p style={{ margin: 0, color: '#666' }}>{m.major} • ⭐ {m.rating}</p>
                     </div>
-                  ))}
+                  </div>
+                  <p style={{ fontSize: '0.9rem', height: '40px', overflow: 'hidden' }}>{m.desc}</p>
+                  <button 
+                    disabled={isPending || currentUser.role === 'mentor'} 
+                    onClick={() => { setSelectedMentor(m); setShowBookModal(true); }} 
+                    style={{ width: '100%', marginTop: '15px', padding: '10px', background: isPending ? '#ccc' : '#2563eb', color: '#fff', border: 'none', borderRadius: '10px', cursor: isPending ? 'not-allowed' : 'pointer' }}
+                  >
+                    {isPending ? 'Request Pending' : currentUser.role === 'mentor' ? 'Switch to Student Account' : 'Book Session'}
+                  </button>
                 </div>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {showLogin && (
-        <div style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'#00000040',display:'flex',alignItems:'center',justifyContent:'center',zIndex:999}}>
-          <div style={{background:'#fff',padding:'2rem',borderRadius:'12px',width:'90%',maxWidth:'400px'}}>
-            <h2 style={{marginTop:0}}>Login</h2>
-            <input
-              placeholder="Email"
-              type="email"
-              value={loginForm.email}
-              onChange={e=>setLoginForm({...loginForm,email:e.target.value})}
-              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
-            />
-            <input
-              placeholder="Password"
-              type="password"
-              value={loginForm.password}
-              onChange={e=>setLoginForm({...loginForm,password:e.target.value})}
-              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
-            />
-            <button onClick={()=>handleLogin(loginForm.email,loginForm.password)} style={{width:'100%',padding:'0.9rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',marginTop:'0.8rem',cursor:'pointer'}}>Login</button>
-            <button onClick={()=>setShowLogin(false)} style={{width:'100%',padding:'0.9rem',background:'transparent',color:'#666',border:'none',borderRadius:'8px',marginTop:'0.5rem',cursor:'pointer'}}>Close</button>
-            <p style={{fontSize:'0.9rem',color:'#666',marginTop:'1rem'}}>Test Mentor: aisha@mentor.my / mentor123</p>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {showBookModal && selectedMentor && (
-        <div style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'#00000040',display:'flex',alignItems:'center',justifyContent:'center',zIndex:999}}>
-          <div style={{background:'#fff',padding:'2rem',borderRadius:'12px',width:'90%',maxWidth:'400px'}}>
-            <h2>Book {selectedMentor.name}</h2>
-            <input
-              type="date"
-              value={bookForm.date}
-              onChange={e=>setBookForm({...bookForm,date:e.target.value})}
-              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
-            />
-            <input
-              placeholder="Meeting Topic / Purpose"
-              value={bookForm.topic}
-              onChange={e=>setBookForm({...bookForm,topic:e.target.value})}
-              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
-            />
-            <button onClick={submitBooking} style={{width:'100%',padding:'0.9rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',marginTop:'0.8rem',cursor:'pointer'}}>Submit Booking</button>
-            <button onClick={()=>setShowBookModal(false)} style={{width:'100%',padding:'0.9rem',background:'transparent',color:'#666',border:'none',borderRadius:'8px',marginTop:'0.5rem',cursor:'pointer'}}>Cancel</button>
+      {/* 学生 Dashboard */}
+      {currentUser && currentPage === 'dashboard' && (
+        <div style={{ padding: '40px 5%', display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '30px' }}>
+          <div style={{ background: '#fff', padding: '25px', borderRadius: '20px' }}>
+            <h3>My Profile</h3>
+            <p><strong>Name:</strong> {currentUser.name}</p>
+            <p><strong>Role:</strong> {currentUser.role.toUpperCase()}</p>
+            <p><strong>Email:</strong> {currentUser.email}</p>
+            <button onClick={() => setShowEditModal(true)} style={{ width: '100%', padding: '10px', border: '1px solid #2563eb', color: '#2563eb', background: 'none', borderRadius: '8px', marginTop: '10px' }}>Edit Details</button>
           </div>
-        </div>
-      )}
-
-      {selectedPathway && (
-        <div style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'#00000040',display:'flex',alignItems:'center',justifyContent:'center',zIndex:999}}>
-          <div style={{background:'#fff',padding:'2rem',borderRadius:'12px',width:'90%',maxWidth:'450px'}}>
-            <div style={{fontSize:'3rem'}}>{selectedPathway.icon}</div>
-            <h2>{selectedPathway.title}</h2>
-            <p>{selectedPathway.desc}</p>
-            <p style={{color:'#2563eb',fontWeight:'bold'}}>{selectedPathway.demand}</p>
-            <div style={{marginTop:'1rem'}}>
-              <p><strong>Key Skills:</strong></p>
-              <div style={{display:'flex',flexWrap:'wrap',gap:'0.5rem'}}>
-                {selectedPathway.skills.map((s,i)=>(
-                  <span key={i} style={{padding:'0.4rem 0.8rem',background:'#eff6ff',color:'#2563eb',borderRadius:'20px',fontSize:'0.9rem'}}>{s}</span>
-                ))}
+          <div style={{ background: '#fff', padding: '25px', borderRadius: '20px' }}>
+            <h3>My Bookings</h3>
+            {myRequests.length === 0 && <p>You haven't booked any sessions yet.</p>}
+            {myRequests.map(b => (
+              <div key={b.id} style={{ borderBottom: '1px solid #eee', padding: '15px 0', display: 'flex', justifyContent: 'space-between' }}>
+                <div>
+                  <h4 style={{ margin: 0 }}>{b.mentorName}</h4>
+                  <p style={{ margin: 0, fontSize: '0.9rem', color: '#666' }}>{b.date} • {b.topic}</p>
+                </div>
+                <div style={{ fontWeight: 'bold', color: b.status === 'Approved' ? 'green' : b.status === 'Denied' ? 'red' : 'orange' }}>{b.status}</div>
               </div>
-            </div>
-            <button onClick={()=>setSelectedPathway(null)} style={{marginTop:'1.5rem',padding:'0.7rem 1.5rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer'}}>Close</button>
+            ))}
           </div>
         </div>
       )}
 
-      {showEditModal && (
-        <div style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'#00000040',display:'flex',alignItems:'center',justifyContent:'center',zIndex:999}}>
-          <div style={{background:'#fff',padding:'2rem',borderRadius:'12px',width:'90%',maxWidth:'400px'}}>
-            <h2>Edit Profile</h2>
-            <input placeholder="Name" value={editForm.name} onChange={e=>setEditForm({...editForm,name:e.target.value})} style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}/>
-            <input placeholder="Phone" value={editForm.phone} onChange={e=>setEditForm({...editForm,phone:e.target.value})} style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}/>
-            <input placeholder="School/University" value={editForm.school} onChange={e=>setEditForm({...editForm,school:e.target.value})} style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}/>
-            <textarea placeholder="Bio" value={editForm.bio} onChange={e=>setEditForm({...editForm,bio:e.target.value})} style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd',minHeight:'80px'}}/>
-            <button onClick={saveProfileEdit} style={{width:'100%',padding:'0.9rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',marginTop:'0.8rem',cursor:'pointer'}}>Save Changes</button>
-            <button onClick={()=>setShowEditModal(false)} style={{width:'100%',padding:'0.9rem',background:'transparent',color:'#666',border:'none',borderRadius:'8px',marginTop:'0.5rem',cursor:'pointer'}}>Close</button>
+      {/* 登录弹窗 */}
+      {showLogin && (
+        <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#fff', padding: '40px', borderRadius: '20px', width: '350px' }}>
+            <h2 style={{ marginTop: 0 }}>Welcome Back</h2>
+            <input placeholder="Email" style={{ width: '100%', padding: '12px', margin: '10px 0', borderRadius: '8px', border: '1px solid #ddd' }} onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })} />
+            <input type="password" placeholder="Password" style={{ width: '100%', padding: '12px', margin: '10px 0', borderRadius: '8px', border: '1px solid #ddd' }} onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })} />
+            <button onClick={() => handleLogin(loginForm.email, loginForm.password)} style={{ width: '100%', padding: '12px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', marginTop: '10px' }}>Login</button>
+            <button onClick={() => setShowLogin(false)} style={{ width: '100%', background: 'none', border: 'none', marginTop: '15px', color: '#666' }}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* 注册弹窗 (带角色选择) */}
+      {showRegister && (
+        <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#fff', padding: '40px', borderRadius: '20px', width: '350px' }}>
+            <h2 style={{ marginTop: 0 }}>Create Account</h2>
+            <input placeholder="Full Name" style={{ width: '100%', padding: '12px', margin: '10px 0', borderRadius: '8px', border: '1px solid #ddd' }} onChange={(e) => setRegForm({ ...regForm, name: e.target.value })} />
+            <input placeholder="Email" style={{ width: '100%', padding: '12px', margin: '10px 0', borderRadius: '8px', border: '1px solid #ddd' }} onChange={(e) => setRegForm({ ...regForm, email: e.target.value })} />
+            <input type="password" placeholder="Password" style={{ width: '100%', padding: '12px', margin: '10px 0', borderRadius: '8px', border: '1px solid #ddd' }} onChange={(e) => setRegForm({ ...regForm, password: e.target.value })} />
+            <div style={{ margin: '10px 0' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.9rem' }}>Join as:</label>
+              <select style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #ddd' }} onChange={(e) => setRegForm({ ...regForm, role: e.target.value })}>
+                <option value="student">Student (Want to learn)</option>
+                <option value="mentor">Mentor (Want to teach)</option>
+              </select>
+            </div>
+            <button onClick={handleRegister} style={{ width: '100%', padding: '12px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', marginTop: '10px' }}>Create Account</button>
+            <button onClick={() => setShowRegister(false)} style={{ width: '100%', background: 'none', border: 'none', marginTop: '15px', color: '#666' }}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* 预约弹窗 */}
+      {showBookModal && (
+        <div className="modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+          <div style={{ background: '#fff', padding: '40px', borderRadius: '20px', width: '350px' }}>
+            <h3>Book {selectedMentor?.name}</h3>
+            <input type="date" style={{ width: '100%', padding: '12px', margin: '10px 0', borderRadius: '8px', border: '1px solid #ddd' }} onChange={(e) => setBookForm({ ...bookForm, date: e.target.value })} />
+            <textarea placeholder="What do you want to discuss?" style={{ width: '100%', padding: '12px', margin: '10px 0', borderRadius: '8px', border: '1px solid #ddd', minHeight: '100px' }} onChange={(e) => setBookForm({ ...bookForm, topic: e.target.value })} />
+            <button onClick={submitBooking} style={{ width: '100%', padding: '12px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', marginTop: '10px' }}>Confirm Booking</button>
+            <button onClick={() => setShowBookModal(false)} style={{ width: '100%', background: 'none', border: 'none', marginTop: '15px', color: '#666' }}>Cancel</button>
           </div>
         </div>
       )}
