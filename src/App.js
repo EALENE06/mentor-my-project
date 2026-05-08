@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-// ========== OOP 角色类 ==========
+// ========== 1. 用户类 ==========
 class User {
   constructor(name, email, phone = '', school = '', bio = '', role = 'student') {
     this.name = name;
@@ -13,11 +13,13 @@ class User {
   }
 
   getRoleInfo() {
-    return this.role === 'mentor' ? "Mentor: Manage own booking requests" : "Student: Find & book mentors";
+    return this.role === 'mentor' 
+      ? "Mentor: Manage your booking requests" 
+      : "Student: Find & book mentors";
   }
 }
 
-// ========== LocalStorage 工具函数 ==========
+// ========== 2. LocalStorage 工具函数 ==========
 const saveUserToDB = (name, email, password, role = 'student') => {
   const users = JSON.parse(localStorage.getItem('mentorMY_users') || '[]');
   users.push({ name, email, password, role });
@@ -31,9 +33,67 @@ const loginCheck = (email, password) => {
 
 const getMentorsFromDB = () => {
   const defaultMentors = [
-    { id: 1, name: 'Aisha Tan', email: 'aisha@mentor.my', major: 'Computer Science', lang: 'English, Malay', rating: 4.9, location: 'Kuching', industry: 'Tech', company: 'Sarawak Digital Economy', desc: 'Guidance on web dev and tech career in Sarawak.' },
-    { id: 2, name: 'Daniel Lee', email: 'daniel@mentor.my', major: 'Data Science', lang: 'English, Malay', rating: 4.8, location: 'Miri', industry: 'Data / Oil & Gas', company: 'Local Energy Firm', desc: 'Python, data analysis and industry career advice.' },
-    { id: 3, name: 'Priya Nair', email: 'priya@mentor.my', major: 'Business', lang: 'English, Malay, Tamil', rating: 4.7, location: 'Sibu', industry: 'Business / SME', company: 'Local Business Consultant', desc: 'Business study and startup guidance.' }
+    { 
+      id: 1, 
+      name: 'Aisha Tan', 
+      email: 'aisha@mentor.my', 
+      major: 'Computer Science', 
+      lang: 'English, Malay', 
+      rating: 4.9, 
+      location: 'Kuching', 
+      industry: 'Tech', 
+      company: 'Sarawak Digital Economy', 
+      desc: 'Guidance on web dev and tech career in Sarawak.' 
+    },
+    { 
+      id: 2, 
+      name: 'Daniel Lee', 
+      email: 'daniel@mentor.my', 
+      major: 'Data Science', 
+      lang: 'English, Malay', 
+      rating: 4.8, 
+      location: 'Miri', 
+      industry: 'Data / Oil & Gas', 
+      company: 'Local Energy Firm', 
+      desc: 'Python, data analysis and industry career advice.' 
+    },
+    { 
+      id: 3, 
+      name: 'Priya Nair', 
+      email: 'priya@mentor.my', 
+      major: 'Business', 
+      lang: 'English, Malay, Tamil', 
+      rating: 4.7, 
+      location: 'Sibu', 
+      industry: 'Business / SME', 
+      company: 'Local Business Consultant', 
+      desc: 'Business study and startup guidance.' 
+    },
+    // 👇 新加的导师
+    { 
+      id: 4, 
+      name: 'Sarah Wong', 
+      email: 'sarah@mentor.my', 
+      major: 'Mechanical Engineering', 
+      lang: 'English, Malay', 
+      rating: 4.6, 
+      location: 'Bintulu', 
+      industry: 'Oil & Gas', 
+      company: 'Petronas', 
+      desc: 'Guidance on engineering career in oil & gas industry.' 
+    },
+    { 
+      id: 5, 
+      name: 'Dr. Kumar', 
+      email: 'kumar@mentor.my', 
+      major: 'Medicine', 
+      lang: 'English, Malay', 
+      rating: 4.8, 
+      location: 'Sibu', 
+      industry: 'Healthcare', 
+      company: 'Sibu Hospital', 
+      desc: 'Career advice for medical students in Sarawak.' 
+    }
   ];
   return JSON.parse(localStorage.getItem('mentorMY_mentors') || JSON.stringify(defaultMentors));
 };
@@ -54,7 +114,7 @@ const getSavedFromDB = () => {
   return JSON.parse(localStorage.getItem('mentorMY_saved') || '[]');
 };
 
-// 预设导师账号
+// 预设导师测试账号
 const MENTOR_DEFAULT_ACC = {
   email: 'aisha@mentor.my',
   password: 'mentor123',
@@ -62,7 +122,9 @@ const MENTOR_DEFAULT_ACC = {
   role: 'mentor'
 };
 
+// ========== 3. 主组件 ==========
 function App() {
+  // 页面状态
   const [currentPage, setCurrentPage] = useState('landing');
   const [currentUser, setCurrentUser] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
@@ -72,28 +134,60 @@ function App() {
   const [selectedPathway, setSelectedPathway] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
 
+  // 数据状态
   const [allMentors, setAllMentors] = useState(getMentorsFromDB());
   const [bookingList, setBookingList] = useState(getBookingsFromDB());
   const [savedMentors, setSavedMentors] = useState(getSavedFromDB());
 
+  // 表单状态
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
-  // 注册新增角色选择
   const [regForm, setRegForm] = useState({ name: '', email: '', password: '', role: 'student' });
   const [landingRegForm, setLandingRegForm] = useState({ name: '', email: '', password: '', role: 'student' });
   const [editForm, setEditForm] = useState({ name: '', email: '', phone: '', school: '', bio: '' });
   const [bookForm, setBookForm] = useState({ date: '', topic: '' });
   const [searchTerm, setSearchTerm] = useState('');
 
+  // 职业路线数据
   const pathways = [
-    { id: 1, title: 'Computer Science', icon: '💻', desc: 'Build software, web app, AI systems.', demand: 'High demand in Sarawak Digital Economy', skills: ['Python', 'JS', 'SQL', 'UI/UX'] },
-    { id: 2, title: 'Business & Accounting', icon: '📊', desc: 'Corporate, banking, startup path.', demand: 'Stable demand for local SMEs', skills: ['Marketing', 'Finance', 'Management'] },
-    { id: 3, title: 'Engineering', icon: '🔧', desc: 'Oil & gas, civil, electrical field.', demand: 'Strong demand in Sarawak industry', skills: ['Math', 'Design', 'Site Operation'] },
-    { id: 4, title: 'Medical & Health', icon: '🩺', desc: 'Nurse, doctor, pharmacy career.', demand: 'Permanent public sector need', skills: ['Biology', 'Chemistry', 'Carework'] }
+    { 
+      id: 1, 
+      title: 'Computer Science', 
+      icon: '💻', 
+      desc: 'Build software, web app, AI systems.', 
+      demand: 'High demand in Sarawak Digital Economy', 
+      skills: ['Python', 'JS', 'SQL', 'UI/UX'] 
+    },
+    { 
+      id: 2, 
+      title: 'Business & Accounting', 
+      icon: '📊', 
+      desc: 'Corporate, banking, startup path.', 
+      demand: 'Stable demand for local SMEs', 
+      skills: ['Marketing', 'Finance', 'Management'] 
+    },
+    { 
+      id: 3, 
+      title: 'Engineering', 
+      icon: '🔧', 
+      desc: 'Oil & gas, civil, electrical field.', 
+      demand: 'Strong demand in Sarawak industry', 
+      skills: ['Math', 'Design', 'Site Operation'] 
+    },
+    { 
+      id: 4, 
+      title: 'Medical & Health', 
+      icon: '🩺', 
+      desc: 'Nurse, doctor, pharmacy career.', 
+      demand: 'Permanent public sector need', 
+      skills: ['Biology', 'Chemistry', 'Carework'] 
+    }
   ];
 
+  // 数据持久化
   useEffect(() => { saveBookingsToDB(bookingList); }, [bookingList]);
   useEffect(() => { saveSavedToDB(savedMentors); }, [savedMentors]);
 
+  // 筛选导师
   const filteredMentors = allMentors.filter(m =>
     m.major.toLowerCase().includes(searchTerm.toLowerCase()) ||
     m.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -101,6 +195,7 @@ function App() {
 
   // 登录逻辑
   const handleLogin = (email, password) => {
+    // 预设导师账号
     if (email === MENTOR_DEFAULT_ACC.email && password === MENTOR_DEFAULT_ACC.password) {
       const mentorUser = new User(MENTOR_DEFAULT_ACC.name, email, '', '', '', 'mentor');
       setCurrentUser(mentorUser);
@@ -109,20 +204,24 @@ function App() {
       setLoginForm({ email: '', password: '' });
       return;
     }
+
+    // 普通用户登录
     const res = loginCheck(email, password);
     if (!res) {
       alert('Email or password incorrect! Please register first.');
       return;
     }
+
     const user = new User(res.name, res.email, '', '', '', res.role);
     setCurrentUser(user);
     setShowLogin(false);
     setLoginForm({ email: '', password: '' });
-    // 登录判断页面跳转
-    if(res.role === 'mentor'){
-      setCurrentPage('mentorPanel')
-    }else{
-      setCurrentPage('home')
+
+    // 按角色跳转页面
+    if (res.role === 'mentor') {
+      setCurrentPage('mentorPanel');
+    } else {
+      setCurrentPage('home');
     }
   };
 
@@ -159,16 +258,16 @@ function App() {
     setBookingList([...bookingList, newBooking]);
     setShowBookModal(false);
     setBookForm({ date: '', topic: '' });
-    // 预约成功提示
-    alert('Booking request sent successfully! Waiting for mentor approval.');
+    alert('✅ Booking request sent successfully! Waiting for mentor approval.');
   };
 
+  // 导师审核操作
   const handleApprove = (bookingId) => {
     const updated = bookingList.map(item =>
       item.id === bookingId ? { ...item, status: 'Approved' } : item
     );
     setBookingList(updated);
-    alert('Booking Approved Successfully');
+    alert('✅ Booking Approved!');
   };
 
   const handleDeny = (bookingId) => {
@@ -176,21 +275,21 @@ function App() {
       item.id === bookingId ? { ...item, status: 'Denied' } : item
     );
     setBookingList(updated);
-    alert('Booking Rejected');
+    alert('❌ Booking Rejected!');
   };
 
-  // 导师获取自己的预约
+  // 获取数据
   const getMyBookingRequests = () => {
     if (!currentUser || currentUser.role !== 'mentor') return [];
     return bookingList.filter(b => b.mentorEmail === currentUser.email);
   };
 
-  // 学生获取自己的预约
   const getMyStudentBookings = () => {
     if (!currentUser || currentUser.role !== 'student') return [];
     return bookingList.filter(b => b.studentEmail === currentUser.email);
   };
 
+  // 保存/取消保存导师
   const toggleSaveMentor = (mentor) => {
     const exist = savedMentors.some(item => item.id === mentor.id);
     if (exist) {
@@ -200,6 +299,7 @@ function App() {
     }
   };
 
+  // 保存个人资料修改
   const saveProfileEdit = () => {
     const updatedUser = new User(
       editForm.name,
@@ -211,8 +311,10 @@ function App() {
     );
     setCurrentUser(updatedUser);
     setShowEditModal(false);
+    alert('✅ Profile updated!');
   };
 
+  // 退出登录
   const logout = () => {
     setCurrentUser(null);
     setCurrentPage('landing');
@@ -220,37 +322,116 @@ function App() {
 
   return (
     <div className="App">
-      <nav className="navbar" style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'1rem 3rem',background:'#fff',boxShadow:'0 2px 8px #00000015'}}>
+      {/* 导航栏 */}
+      <nav className="navbar" style={{
+        display:'flex',
+        justifyContent:'space-between',
+        alignItems:'center',
+        padding:'1rem 3rem',
+        background:'#fff',
+        boxShadow:'0 2px 8px #00000015'
+      }}>
         <div className="logo" style={{fontWeight:'bold',fontSize:'1.3rem'}}>Mentor MY</div>
         <ul style={{display:'flex',gap:'1.5rem',listStyle:'none',margin:0,padding:0}}>
           {currentUser ? (
             <>
-              <li><button onClick={()=>setCurrentPage('home')} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}>Home</button></li>
+              <li>
+                <button 
+                  onClick={()=>setCurrentPage('home')} 
+                  style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}
+                >
+                  Home
+                </button>
+              </li>
               {currentUser.role === 'student' && (
                 <>
-                  <li><button onClick={()=>setCurrentPage('mentors')} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}>Mentors</button></li>
-                  <li><button onClick={()=>setCurrentPage('pathways')} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}>Career Path</button></li>
-                  <li><button onClick={()=>setCurrentPage('dashboard')} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}>Dashboard</button></li>
+                  <li>
+                    <button 
+                      onClick={()=>setCurrentPage('mentors')} 
+                      style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}
+                    >
+                      Mentors
+                    </button>
+                  </li>
+                  <li>
+                    <button 
+                      onClick={()=>setCurrentPage('pathways')} 
+                      style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}
+                    >
+                      Career Path
+                    </button>
+                  </li>
+                  <li>
+                    <button 
+                      onClick={()=>setCurrentPage('dashboard')} 
+                      style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}
+                    >
+                      Dashboard
+                    </button>
+                  </li>
                 </>
               )}
               {currentUser.role === 'mentor' && (
-                <li><button onClick={()=>setCurrentPage('mentorPanel')} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem',color:'#2563eb'}}>Mentor Management Panel</button></li>
+                <li>
+                  <button 
+                    onClick={()=>setCurrentPage('mentorPanel')} 
+                    style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem',color:'#2563eb'}}
+                  >
+                    Mentor Panel
+                  </button>
+                </li>
               )}
-              <li><button onClick={logout} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem',color:'#dc2626'}}>Logout</button></li>
+              <li>
+                <button 
+                  onClick={logout} 
+                  style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem',color:'#dc2626'}}
+                >
+                  Logout
+                </button>
+              </li>
             </>
           ) : (
             <>
-              <li><button onClick={()=>setShowLogin(true)} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}>Login</button></li>
-              <li><button onClick={()=>setShowRegister(true)} style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}>Register</button></li>
+              <li>
+                <button 
+                  onClick={()=>setShowLogin(true)} 
+                  style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}
+                >
+                  Login
+                </button>
+              </li>
+              <li>
+                <button 
+                  onClick={()=>setShowRegister(true)} 
+                  style={{border:'none',background:'none',cursor:'pointer',fontSize:'1rem'}}
+                >
+                  Register
+                </button>
+              </li>
             </>
           )}
         </ul>
       </nav>
 
-      {/* 首页注册 带身份选择 */}
+      {/* 首页注册 */}
       {!currentUser && currentPage === 'landing' && (
-        <section style={{minHeight:'80vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'2rem'}}>
-          <div style={{background:'rgba(255,255,255,0.92)',padding:'2.5rem',borderRadius:'16px',boxShadow:'0 8px 32px #00000015',maxWidth:'450px',width:'100%',textAlign:'center'}}>
+        <section style={{
+          minHeight:'80vh',
+          display:'flex',
+          flexDirection:'column',
+          alignItems:'center',
+          justifyContent:'center',
+          padding:'2rem'
+        }}>
+          <div style={{
+            background:'rgba(255,255,255,0.92)',
+            padding:'2.5rem',
+            borderRadius:'16px',
+            boxShadow:'0 8px 32px #00000015',
+            maxWidth:'450px',
+            width:'100%',
+            textAlign:'center'
+          }}>
             <h1 style={{marginBottom:'0.5rem'}}>Join Mentor MY 🎓</h1>
             <p style={{color:'#666',marginBottom:'1.5rem'}}>Find your Sarawak career mentor</p>
 
@@ -275,7 +456,7 @@ function App() {
               style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
             />
 
-            {/* 身份选择下拉框 */}
+            {/* 角色选择下拉框 */}
             <select
               value={landingRegForm.role}
               onChange={e=>setLandingRegForm({...landingRegForm,role:e.target.value})}
@@ -287,13 +468,28 @@ function App() {
 
             <button
               onClick={()=>handleRegister(landingRegForm.name,landingRegForm.email,landingRegForm.password,landingRegForm.role)}
-              style={{width:'100%',padding:'0.9rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',marginTop:'0.8rem',cursor:'pointer'}}
+              style={{
+                width:'100%',
+                padding:'0.9rem',
+                background:'#2563eb',
+                color:'#fff',
+                border:'none',
+                borderRadius:'8px',
+                fontSize:'1rem',
+                marginTop:'0.8rem',
+                cursor:'pointer'
+              }}
             >
               Register Now
             </button>
             <p style={{marginTop:'1.2rem'}}>
               Already have account?
-              <button onClick={()=>setShowLogin(true)} style={{color:'#2563eb',border:'none',background:'none',cursor:'pointer',marginLeft:'0.3rem'}}>Login</button>
+              <button 
+                onClick={()=>setShowLogin(true)} 
+                style={{color:'#2563eb',border:'none',background:'none',cursor:'pointer',marginLeft:'0.3rem'}}
+              >
+                Login
+              </button>
             </p>
           </div>
         </section>
@@ -314,14 +510,27 @@ function App() {
                   <p style={{margin:'0.3rem 0'}}>Topic: {item.topic}</p>
                   <p style={{margin:'0.3rem 0',fontWeight:'bold'}}>
                     Status: 
-                    <span style={{color:item.status==='Approved'?'#16a34a':item.status==='Denied'?'#dc2626':'#ca8a04'}}>
+                    <span style={{
+                      color: item.status==='Approved'?'#16a34a':
+                             item.status==='Denied'?'#dc2626':'#ca8a04'
+                    }}>
                       &nbsp;{item.status}
                     </span>
                   </p>
                   {item.status === 'Pending' && (
                     <div style={{marginTop:'1rem',display:'flex',gap:'1rem'}}>
-                      <button onClick={()=>handleApprove(item.id)} style={{padding:'0.6rem 1.2rem',background:'#16a34a',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}>Approve</button>
-                      <button onClick={()=>handleDeny(item.id)} style={{padding:'0.6rem 1.2rem',background:'#dc2626',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}>Deny</button>
+                      <button 
+                        onClick={()=>handleApprove(item.id)} 
+                        style={{padding:'0.6rem 1.2rem',background:'#16a34a',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}
+                      >
+                        Approve
+                      </button>
+                      <button 
+                        onClick={()=>handleDeny(item.id)} 
+                        style={{padding:'0.6rem 1.2rem',background:'#dc2626',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}
+                      >
+                        Deny
+                      </button>
                     </div>
                   )}
                 </div>
@@ -338,13 +547,25 @@ function App() {
           <p style={{fontSize:'1.1rem',color:'#666',maxWidth:'700px',margin:'1rem auto'}}>
             Explore professional mentors, book consultation, plan your Sarawak career path.
           </p>
-          <button onClick={()=>setCurrentPage('mentors')} style={{padding:'1rem 2rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',marginTop:'1.5rem',cursor:'pointer'}}>
+          <button 
+            onClick={()=>setCurrentPage('mentors')} 
+            style={{
+              padding:'1rem 2rem',
+              background:'#2563eb',
+              color:'#fff',
+              border:'none',
+              borderRadius:'8px',
+              fontSize:'1rem',
+              marginTop:'1.5rem',
+              cursor:'pointer'
+            }}
+          >
             Browse All Mentors
           </button>
         </section>
       )}
 
-      {/* 导师列表 仅学生可见 */}
+      {/* 导师列表（仅学生可见） */}
       {currentUser && currentUser.role === 'student' && currentPage === 'mentors' && (
         <section style={{padding:'3rem',maxWidth:'1200px',margin:'0 auto'}}>
           <h2 style={{marginBottom:'1.5rem'}}>All Mentors</h2>
@@ -358,7 +579,18 @@ function App() {
             {filteredMentors.map(m=>(
               <div key={m.id} style={{padding:'1.5rem',background:'#fff',borderRadius:'12px',boxShadow:'0 4px 12px #00000010'}}>
                 <div style={{display:'flex',alignItems:'center',gap:'1rem',marginBottom:'1rem'}}>
-                  <div style={{width:'45px',height:'45px',borderRadius:'50%',background:'#2563eb',color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:'bold',fontSize:'1.2rem'}}>
+                  <div style={{
+                    width:'45px',
+                    height:'45px',
+                    borderRadius:'50%',
+                    background:'#2563eb',
+                    color:'#fff',
+                    display:'flex',
+                    alignItems:'center',
+                    justifyContent:'center',
+                    fontWeight:'bold',
+                    fontSize:'1.2rem'
+                  }}>
                     {m.name[0]}
                   </div>
                   <div>
@@ -370,10 +602,23 @@ function App() {
                 <p style={{margin:'0.4rem 0'}}><strong>Location:</strong> {m.location}</p>
                 <p style={{margin:'0.4rem 0',fontSize:'0.9rem',color:'#555'}}>{m.desc}</p>
                 <div style={{display:'flex',gap:'0.8rem',marginTop:'1.2rem'}}>
-                  <button onClick={()=>toggleSaveMentor(m)} style={{flex:1,padding:'0.6rem',border:`1px solid ${savedMentors.some(x=>x.id===m.id)?'#2563eb':'#ddd'}`,background:savedMentors.some(x=>x.id===m.id)?'#eff6ff':'#fff',borderRadius:'6px',cursor:'pointer'}}>
+                  <button 
+                    onClick={()=>toggleSaveMentor(m)} 
+                    style={{
+                      flex:1,
+                      padding:'0.6rem',
+                      border:`1px solid ${savedMentors.some(x=>x.id===m.id)?'#2563eb':'#ddd'}`,
+                      background:savedMentors.some(x=>x.id===m.id)?'#eff6ff':'#fff',
+                      borderRadius:'6px',
+                      cursor:'pointer'
+                    }}
+                  >
                     {savedMentors.some(x=>x.id===m.id) ? 'Saved' : 'Save'}
                   </button>
-                  <button onClick={()=>{setSelectedMentor(m);setShowBookModal(true);}} style={{flex:1,padding:'0.6rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}>
+                  <button 
+                    onClick={()=>{setSelectedMentor(m);setShowBookModal(true);}} 
+                    style={{flex:1,padding:'0.6rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}
+                  >
                     Book
                   </button>
                 </div>
@@ -383,7 +628,7 @@ function App() {
         </section>
       )}
 
-      {/* 职业路线 */}
+      {/* 职业路线页面 */}
       {currentUser && currentUser.role === 'student' && currentPage === 'pathways' && (
         <section style={{padding:'3rem',maxWidth:'1200px',margin:'0 auto'}}>
           <h2 style={{marginBottom:'2rem'}}>Sarawak Career Pathways</h2>
@@ -394,14 +639,19 @@ function App() {
                 <h3>{p.title}</h3>
                 <p>{p.desc}</p>
                 <p style={{color:'#2563eb',fontWeight:'bold'}}>{p.demand}</p>
-                <button onClick={()=>setSelectedPathway(p)} style={{marginTop:'1rem',padding:'0.6rem 1rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}>View Details</button>
+                <button 
+                  onClick={()=>setSelectedPathway(p)} 
+                  style={{marginTop:'1rem',padding:'0.6rem 1rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}
+                >
+                  View Details
+                </button>
               </div>
             ))}
           </div>
         </section>
       )}
 
-      {/* 学生个人仪表盘 */}
+      {/* 学生仪表盘 */}
       {currentUser && currentUser.role === 'student' && currentPage === 'dashboard' && (
         <section style={{padding:'3rem',maxWidth:'1000px',margin:'0 auto'}}>
           <h2>Dashboard</h2>
@@ -414,7 +664,21 @@ function App() {
               <p><strong>Phone:</strong> {currentUser.phone || 'Not set'}</p>
               <p><strong>School:</strong> {currentUser.school || 'Not set'}</p>
               <p><strong>Bio:</strong> {currentUser.bio || 'Not set'}</p>
-              <button onClick={()=>{setEditForm({name:currentUser.name,email:currentUser.email,phone:currentUser.phone,school:currentUser.school,bio:currentUser.bio});setShowEditModal(true);}} style={{marginTop:'1rem',padding:'0.6rem 1rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}>Edit Profile</button>
+              <button 
+                onClick={()=>{
+                  setEditForm({
+                    name:currentUser.name,
+                    email:currentUser.email,
+                    phone:currentUser.phone,
+                    school:currentUser.school,
+                    bio:currentUser.bio
+                  });
+                  setShowEditModal(true);
+                }} 
+                style={{marginTop:'1rem',padding:'0.6rem 1rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'6px',cursor:'pointer'}}
+              >
+                Edit Profile
+              </button>
             </div>
             <div style={{padding:'1.5rem',background:'#f8f9fa',borderRadius:'12px'}}>
               <h3>My Bookings</h3>
@@ -428,7 +692,11 @@ function App() {
                       <p style={{margin:'0'}}><strong>Date:</strong> {b.date}</p>
                       <p style={{margin:'0'}}>
                         Status: 
-                        <span style={{color:b.status==='Approved'?'#16a34a':b.status==='Denied'?'#dc2626':'#ca8a04',fontWeight:'bold'}}>
+                        <span style={{
+                          color: b.status==='Approved'?'#16a34a':
+                                 b.status==='Denied'?'#dc2626':'#ca8a04',
+                          fontWeight:'bold'
+                        }}>
                           &nbsp;{b.status}
                         </span>
                       </p>
@@ -443,7 +711,18 @@ function App() {
 
       {/* 登录弹窗 */}
       {showLogin && (
-        <div style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'#00000040',display:'flex',alignItems:'center',justifyContent:'center',zIndex:999}}>
+        <div style={{
+          position:'fixed',
+          top:0,
+          left:0,
+          width:'100%',
+          height:'100%',
+          background:'#00000040',
+          display:'flex',
+          alignItems:'center',
+          justifyContent:'center',
+          zIndex:999
+        }}>
           <div style={{background:'#fff',padding:'2rem',borderRadius:'12px',width:'90%',maxWidth:'400px'}}>
             <h2 style={{marginTop:0}}>Login</h2>
             <input
@@ -460,16 +739,99 @@ function App() {
               onChange={e=>setLoginForm({...loginForm,password:e.target.value})}
               style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
             />
-            <button onClick={()=>handleLogin(loginForm.email,loginForm.password)} style={{width:'100%',padding:'0.9rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',marginTop:'0.8rem',cursor:'pointer'}}>Login</button>
-            <button onClick={()=>setShowLogin(false)} style={{width:'100%',padding:'0.9rem',background:'transparent',color:'#666',border:'none',borderRadius:'8px',marginTop:'0.5rem',cursor:'pointer'}}>Close</button>
-            <p style={{fontSize:'0.9rem',color:'#666',marginTop:'1rem'}}>Test Mentor: aisha@mentor.my / mentor123</p>
+            <button 
+              onClick={()=>handleLogin(loginForm.email,loginForm.password)} 
+              style={{width:'100%',padding:'0.9rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',marginTop:'0.8rem',cursor:'pointer'}}
+            >
+              Login
+            </button>
+            <button 
+              onClick={()=>setShowLogin(false)} 
+              style={{width:'100%',padding:'0.9rem',background:'transparent',color:'#666',border:'none',borderRadius:'8px',marginTop:'0.5rem',cursor:'pointer'}}
+            >
+              Close
+            </button>
+            <p style={{fontSize:'0.9rem',color:'#666',marginTop:'1rem'}}>
+              Test Mentor: aisha@mentor.my / mentor123
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* 注册弹窗 */}
+      {showRegister && (
+        <div style={{
+          position:'fixed',
+          top:0,
+          left:0,
+          width:'100%',
+          height:'100%',
+          background:'#00000040',
+          display:'flex',
+          alignItems:'center',
+          justifyContent:'center',
+          zIndex:999
+        }}>
+          <div style={{background:'#fff',padding:'2rem',borderRadius:'12px',width:'90%',maxWidth:'400px'}}>
+            <h2 style={{marginTop:0}}>Register</h2>
+            <input
+              placeholder="Full Name"
+              value={regForm.name}
+              onChange={e=>setRegForm({...regForm,name:e.target.value})}
+              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
+            />
+            <input
+              placeholder="Email"
+              type="email"
+              value={regForm.email}
+              onChange={e=>setRegForm({...regForm,email:e.target.value})}
+              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
+            />
+            <input
+              placeholder="Password"
+              type="password"
+              value={regForm.password}
+              onChange={e=>setRegForm({...regForm,password:e.target.value})}
+              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
+            />
+            <select
+              value={regForm.role}
+              onChange={e=>setRegForm({...regForm,role:e.target.value})}
+              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
+            >
+              <option value="student">Student</option>
+              <option value="mentor">Mentor</option>
+            </select>
+            <button 
+              onClick={()=>handleRegister(regForm.name,regForm.email,regForm.password,regForm.role)} 
+              style={{width:'100%',padding:'0.9rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',marginTop:'0.8rem',cursor:'pointer'}}
+            >
+              Register
+            </button>
+            <button 
+              onClick={()=>setShowRegister(false)} 
+              style={{width:'100%',padding:'0.9rem',background:'transparent',color:'#666',border:'none',borderRadius:'8px',marginTop:'0.5rem',cursor:'pointer'}}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
 
       {/* 预约弹窗 */}
       {showBookModal && selectedMentor && (
-        <div style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'#00000040',display:'flex',alignItems:'center',justifyContent:'center',zIndex:999}}>
+        <div style={{
+          position:'fixed',
+          top:0,
+          left:0,
+          width:'100%',
+          height:'100%',
+          background:'#00000040',
+          display:'flex',
+          alignItems:'center',
+          justifyContent:'center',
+          zIndex:999
+        }}>
           <div style={{background:'#fff',padding:'2rem',borderRadius:'12px',width:'90%',maxWidth:'400px'}}>
             <h2>Book {selectedMentor.name}</h2>
             <input
@@ -484,15 +846,36 @@ function App() {
               onChange={e=>setBookForm({...bookForm,topic:e.target.value})}
               style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
             />
-            <button onClick={submitBooking} style={{width:'100%',padding:'0.9rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',marginTop:'0.8rem',cursor:'pointer'}}>Submit Booking</button>
-            <button onClick={()=>setShowBookModal(false)} style={{width:'100%',padding:'0.9rem',background:'transparent',color:'#666',border:'none',borderRadius:'8px',marginTop:'0.5rem',cursor:'pointer'}}>Cancel</button>
+            <button 
+              onClick={submitBooking} 
+              style={{width:'100%',padding:'0.9rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',marginTop:'0.8rem',cursor:'pointer'}}
+            >
+              Submit Booking
+            </button>
+            <button 
+              onClick={()=>setShowBookModal(false)} 
+              style={{width:'100%',padding:'0.9rem',background:'transparent',color:'#666',border:'none',borderRadius:'8px',marginTop:'0.5rem',cursor:'pointer'}}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}
 
       {/* 职业详情弹窗 */}
       {selectedPathway && (
-        <div style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'#00000040',display:'flex',alignItems:'center',justifyContent:'center',zIndex:999}}>
+        <div style={{
+          position:'fixed',
+          top:0,
+          left:0,
+          width:'100%',
+          height:'100%',
+          background:'#00000040',
+          display:'flex',
+          alignItems:'center',
+          justifyContent:'center',
+          zIndex:999
+        }}>
           <div style={{background:'#fff',padding:'2rem',borderRadius:'12px',width:'90%',maxWidth:'450px'}}>
             <div style={{fontSize:'3rem'}}>{selectedPathway.icon}</div>
             <h2>{selectedPathway.title}</h2>
@@ -502,26 +885,74 @@ function App() {
               <p><strong>Key Skills:</strong></p>
               <div style={{display:'flex',flexWrap:'wrap',gap:'0.5rem'}}>
                 {selectedPathway.skills.map((s,i)=>(
-                  <span key={i} style={{padding:'0.4rem 0.8rem',background:'#eff6ff',color:'#2563eb',borderRadius:'20px',fontSize:'0.9rem'}}>{s}</span>
+                  <span key={i} style={{padding:'0.4rem 0.8rem',background:'#eff6ff',color:'#2563eb',borderRadius:'20px',fontSize:'0.9rem'}}>
+                    {s}
+                  </span>
                 ))}
               </div>
             </div>
-            <button onClick={()=>setSelectedPathway(null)} style={{marginTop:'1.5rem',padding:'0.7rem 1.5rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer'}}>Close</button>
+            <button 
+              onClick={()=>setSelectedPathway(null)} 
+              style={{marginTop:'1.5rem',padding:'0.7rem 1.5rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',cursor:'pointer'}}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
 
       {/* 资料编辑弹窗 */}
       {showEditModal && (
-        <div style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',background:'#00000040',display:'flex',alignItems:'center',justifyContent:'center',zIndex:999}}>
+        <div style={{
+          position:'fixed',
+          top:0,
+          left:0,
+          width:'100%',
+          height:'100%',
+          background:'#00000040',
+          display:'flex',
+          alignItems:'center',
+          justifyContent:'center',
+          zIndex:999
+        }}>
           <div style={{background:'#fff',padding:'2rem',borderRadius:'12px',width:'90%',maxWidth:'400px'}}>
             <h2>Edit Profile</h2>
-            <input placeholder="Name" value={editForm.name} onChange={e=>setEditForm({...editForm,name:e.target.value})} style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}/>
-            <input placeholder="Phone" value={editForm.phone} onChange={e=>setEditForm({...editForm,phone:e.target.value})} style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}/>
-            <input placeholder="School/University" value={editForm.school} onChange={e=>setEditForm({...editForm,school:e.target.value})} style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}/>
-            <textarea placeholder="Bio" value={editForm.bio} onChange={e=>setEditForm({...editForm,bio:e.target.value})} style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd',minHeight:'80px'}}/>
-            <button onClick={saveProfileEdit} style={{width:'100%',padding:'0.9rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',marginTop:'0.8rem',cursor:'pointer'}}>Save Changes</button>
-            <button onClick={()=>setShowEditModal(false)} style={{width:'100%',padding:'0.9rem',background:'transparent',color:'#666',border:'none',borderRadius:'8px',marginTop:'0.5rem',cursor:'pointer'}}>Close</button>
+            <input 
+              placeholder="Name" 
+              value={editForm.name} 
+              onChange={e=>setEditForm({...editForm,name:e.target.value})} 
+              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
+            />
+            <input 
+              placeholder="Phone" 
+              value={editForm.phone} 
+              onChange={e=>setEditForm({...editForm,phone:e.target.value})} 
+              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
+            />
+            <input 
+              placeholder="School/University" 
+              value={editForm.school} 
+              onChange={e=>setEditForm({...editForm,school:e.target.value})} 
+              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd'}}
+            />
+            <textarea 
+              placeholder="Bio" 
+              value={editForm.bio} 
+              onChange={e=>setEditForm({...editForm,bio:e.target.value})} 
+              style={{width:'100%',padding:'0.9rem',margin:'0.6rem 0',borderRadius:'8px',border:'1px solid #ddd',minHeight:'80px'}}
+            />
+            <button 
+              onClick={saveProfileEdit} 
+              style={{width:'100%',padding:'0.9rem',background:'#2563eb',color:'#fff',border:'none',borderRadius:'8px',fontSize:'1rem',marginTop:'0.8rem',cursor:'pointer'}}
+            >
+              Save Changes
+            </button>
+            <button 
+              onClick={()=>setShowEditModal(false)} 
+              style={{width:'100%',padding:'0.9rem',background:'transparent',color:'#666',border:'none',borderRadius:'8px',marginTop:'0.5rem',cursor:'pointer'}}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
